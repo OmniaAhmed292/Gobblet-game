@@ -7,7 +7,51 @@ Game class should be responsible for:
 * Checking win conditions
 * Providing available moves for current player
 '''
+import Pile
+import Player
+import Postion
+
+
 class Game:
+  player: list[Player]
+  grid: list[list[Pile]]
+
+  def __init__(self, player1_name, player2_name) -> None:
+    self.player = [Player(player1_name, 0), Player(player2_name, 1)]
+    self.grid = [
+        [Pile(),Pile(),Pile(),Pile()],
+        [Pile(),Pile(),Pile(),Pile()],
+        [Pile(),Pile(),Pile(),Pile()],
+        [Pile(),Pile(),Pile(),Pile()]
+        ]
+
+  def print_grid(self) -> None:
+    for row in self.grid:
+      for cell in row:
+        print(cell.rocks[-1].size if cell.rocks else '#', end=' ')
+      print("\n")
+    print("\n")
+
+  def is_valid(self, player, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
+    if from_grid and from_pile:
+      raise Exception("you either play from the grid or your piles")
+    if not from_grid and not from_pile:
+      raise Exception("you should be at least play from the grid or your piles")
+
+    if from_grid and self.grid[from_grid.x][from_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id != player:
+      raise Exception("you can not play from another player rocks")
+
+    if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id != player:
+      # TODO check case if 3 in row else
+      raise Exception("you can not play on another player rock unless he had 3 in a row")
+
+  def do_turn(self, player, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
+    self.is_valid(player, to_grid, from_grid, from_pile)
+    if from_pile:
+      self.grid[to_grid.x][to_grid.y].push(self.player[player].piles[from_pile].pop())
+    elif from_grid:
+      self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
+
 
     def __init__(self):
         self.board = [[None for _ in range(4)] for _ in range(4)]
