@@ -7,9 +7,9 @@ Game class should be responsible for:
 * Checking win conditions
 * Providing available moves for current player
 '''
-import Pile
-import Player
-import Postion
+from Pile import Pile
+from Player import Player
+from Postion import Postion
 
 
 class Game:
