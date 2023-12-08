@@ -11,6 +11,7 @@ class Pile:
       self.rocks.append(Rock(1, id))
       self.rocks.append(Rock(2, id))
       self.rocks.append(Rock(3, id))
+      self.rocks.append(Rock(4,id))
 
   def push(self, rock: Rock) -> None:
     if not self.rocks or self.rocks[-1].size < rock.size:
