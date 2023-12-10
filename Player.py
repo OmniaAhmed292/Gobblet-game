@@ -9,4 +9,5 @@ class Player:
   def __init__(self, name, id) -> None:
     self.name = name
     self.id = id
-    self.piles = [Pile(True, id),Pile(True, id),Pile(True, id),Pile(True, id)]
+    self.piles = [Pile(True, id),Pile(True, id),Pile(True, id)]
+    

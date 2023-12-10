@@ -124,47 +124,63 @@ class Game:
       if all(self.grid[i][3 - i].rocks and self.grid[i][3 - i].rocks[-1].id == self.grid[0][3].rocks[-1].id for i in range(4)):
           return self.grid[0][3].rocks[-1].id
 
+  def has_legalMoves(self):
+        """
+        Checks if any legal move is available for the current player.
 
-#     def __init__(self):
-#         self.board = [[None for _ in range(4)] for _ in range(4)]
-#         self.white_pieces = generate_pieces("white")
-#         self.black_pieces = generate_pieces("black")
-#         self.white_reserves = get_reserves(self.white_pieces)
-#         self.black_reserves = get_reserves(self.black_pieces)
-#         self.current_player = "white"
-#
-#     def execute_move(self, move):
-#         # Execute the move
-#         piece, start, end = move
-#
-#         # Remove piece from reserves if first move
-#         if start is None:
-#             self.remove_from_reserves(piece, self.current_player)
-#
-#         # Move piece on the board
-#         self.move_piece(start, end)
-#
-#         # Switch players
-#         if self.current_player == "white":
-#             self.current_player = "black"
-#         else:
-#             self.current_player = "white"
-#
-#     def validate_move(self, move):
-#         # Validate move based on rules
-#         # Return True if valid, False if invalid
-#
+        Returns:
+            True if a legal move is available, False otherwise.
+        """
+        for to_grid_x in range(4):
+            for to_grid_y in range(4):
+                # Check if placing a new rock is legal
+                if not self.grid[to_grid_x][to_grid_y].rocks:
+                    # Check if placing a new rock is legal
+                    if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y)):
+                        return True
 
-#     def get_possible_moves(self):
-#         # Return list of legal moves for current player
-#
-# # Helper functions
-#
-#     def remove_from_reserves(self, piece, player):
-#         # Remove piece from player reserves
-#
-#     def move_piece(self, start, end):
-#         # Handle move of piece start -> end
-#
-#     def get_reserves(self, pieces):
-#         # Get remaining reserve p
+                for from_pile_index in range(3):
+                    if not self.player[self.current_player.player_id].piles[from_pile_index].is_empty():
+                        # Check if playing from a pile is legal
+                        if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y), from_pile=from_pile_index):
+                            return True
+
+                for from_grid_x in range(4):
+                    for from_grid_y in range(4):
+                        if self.grid[from_grid_x][from_grid_y].rocks and self.grid[from_grid_x][from_grid_y].rocks[-1].id == self.current_player.player_id:
+                            # Check if moving a rock from the grid is legal
+                            if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y), Postion(from_grid_x, from_grid_y)):
+                                return True
+        return False
+
+
+  def check_tie(self): 
+    #All spaces are filled and it's been three moves with no winner
+    if self.check_three_repetitions():
+        return True
+    #No more valid moves can be made
+    if not self.has_legalMoves():
+        if(self.check_win() == None):
+            return True
+        
+
+    return False
+
+#def possible_moves(self, player_id):
+''' def check_three_repetitions(self):
+    """
+    Checks if the current state of the game has three repetitions of identical moves.
+
+    Returns:
+        True if three repetitions are found, False otherwise.
+    """
+
+    # Keep track of the game history
+    game_history = []
+
+    # Check for three consecutive identical entries in the history
+    for i in range(len(game_history) - 2):
+        if game_history[i] == game_history[i + 1] and game_history[i + 1] == game_history[i + 2]:
+            return True
+
+    return False'''
