@@ -13,9 +13,17 @@ from Postion import Postion
 
 
 class Game:
+  
   player: list[Player]
   grid: list[list[Pile]]
-
+  
+    
+  """
+    Initializes a new instance of the Game class.
+    Args:
+      player1_name (str): The name of the first player.
+      player2_name (str): The name of the second player.
+    """
   def __init__(self, player1_name, player2_name) -> None:
     self.player = [Player(player1_name, 0), Player(player2_name, 1)]
     self.grid = [
@@ -25,6 +33,9 @@ class Game:
         [Pile(),Pile(),Pile(),Pile()]
         ]
 
+  """
+    Prints the current state of the game board.
+  """
   def print_grid(self) -> None:
     for row in self.grid:
       for cell in row:
@@ -32,7 +43,17 @@ class Game:
       print("\n")
     print("\n")
 
+  """
+    Checks if the move is valid.
+    Args:
+        player_id (int): The ID of the player making the move.
+        to_grid (Postion): The position to which the move is being made.
+        from_grid (Postion, optional): The position from which the move is being made. Defaults to None.
+        from_pile (int, optional): The pile from which the move is being made. Defaults to None.
+  """
   def is_valid(self, player_id, to_grid, from_grid=None, from_pile=None):
+      
+
       if from_grid and from_pile:
           raise Exception("You can either play from the grid or your piles, not both.")
       if not from_grid and not from_pile:
@@ -42,7 +63,8 @@ class Game:
           -1].id != player_id:
           raise Exception("You cannot play from another player's rocks.")
 
-      if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id != player_id:
+    
+      if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id != player_id: #if the space is occupied by another player's rock
           
           cnt = 0
 
@@ -65,6 +87,7 @@ class Game:
           if cnt == 3:
               return
 
+          # Check diagonal
           if (
                   (to_grid.x + 2 < 4 and to_grid.y + 2 < 4
                    and self.grid[to_grid.x + 1][to_grid.y + 1].rocks
@@ -94,6 +117,14 @@ class Game:
           else:
               raise Exception("You cannot play on another player's rock unless they have 3 in a row")
 
+  """
+    Checks if Valid then executes a move and updates the game state.
+    Args:
+        player_id (int): The ID of the player making the move.
+        to_grid (Postion): The position to which the move is being made.
+        from_grid (Postion, optional): The position from which the move is being made. Defaults to None.
+        from_pile (int, optional): The pile from which the move is being made. Defaults to None.
+  """
   def do_turn(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
     self.is_valid(player_id, to_grid, from_grid, from_pile)
     if from_pile:
@@ -101,6 +132,11 @@ class Game:
     elif from_grid:
       self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
 
+  """
+  Checks if the current state of the game if it is a win
+  Returns:
+      True if three repetitions are found, False otherwise.
+  """
   def check_win(self):
       cnt = 0
       for i in range(4):
@@ -153,7 +189,11 @@ class Game:
                                 return True
         return False
 
-
+  """
+    Checks if the current state of the game has three repetitions of identical moves.
+    Returns:
+        True if three repetitions are found, False otherwise.
+  """
   def check_tie(self): 
     #All spaces are filled and it's been three moves with no winner
     if self.check_three_repetitions():

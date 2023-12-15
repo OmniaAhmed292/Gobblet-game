@@ -1,5 +1,10 @@
 player, opponent = 1,2
 
+"""
+This function returns true if there are moves
+remaining on the board. It returns false if
+there are no moves left to play.
+"""
 def is_moves_left(board):
     for i in range(4):
         for j in range(4):
@@ -7,6 +12,10 @@ def is_moves_left(board):
                 return True
     return False
 
+"""
+This is the evaluation function which returns
+the score of the board.
+"""
 def evaluate(b):
     for row in range(4):
         if all(b[row][col] == player for col in range(4)):
@@ -32,6 +41,11 @@ def evaluate(b):
 
     return 0
 
+"""
+This is the minimax function. It considers all
+the possible ways the game can go and returns
+the value of the board.
+"""
 def minimax(board, depth, is_max):
     score = evaluate(board)
     if depth > 3:
@@ -70,6 +84,10 @@ def minimax(board, depth, is_max):
 
         return best
 
+"""
+This will return the best possible
+move for the player
+"""
 def find_best_move(board):
     best_val = -1000
     best_move = (-1, -1)
