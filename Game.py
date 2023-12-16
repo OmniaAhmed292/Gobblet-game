@@ -156,7 +156,8 @@ class Game:
                     cnt += 1
                 if cnt == 4:
                     return self.grid[i][0].rocks[-1].id
-
+                  
+          # Check Diagonal
       if all(self.grid[i][i].rocks and self.grid[i][i].rocks[-1].id == self.grid[0][0].rocks[-1].id for i in range(4)):
           return self.grid[0][0].rocks[-1].id
 
