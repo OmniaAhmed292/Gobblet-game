@@ -139,6 +139,8 @@ class Game:
   """
   def check_win(self):
       cnt = 0
+
+     # Check for a winning condition horizontally
       for i in range(4):
           for j in range(4):
               if self.grid[i][j].rocks and self.grid[0][j].rocks and self.grid[i][j].rocks[-1].id == self.grid[0][j].rocks[-1].id:
@@ -146,6 +148,8 @@ class Game:
               if cnt == 4:
                   return self.grid[0][j].rocks[-1].id
       cnt = 0
+
+        # Check for a winning condition vertically
       for i in range(4):
             for j in range(4):
                 if self.grid[j][i].rocks and self.grid[0][j].rocks and self.grid[j][i].rocks[-1].id == self.grid[0][j].rocks[-1].id:
