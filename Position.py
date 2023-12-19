@@ -1,4 +1,4 @@
-class Postion:
+class Position:
   """
   Represents a position with x and y coordinates.
   """

@@ -9,7 +9,7 @@ Game class should be responsible for:
 '''
 from Pile import Pile
 from Player import Player
-from Postion import Postion
+from Position import Position
 
 
 class Game:
@@ -47,8 +47,8 @@ class Game:
     Checks if the move is valid.
     Args:
         player_id (int): The ID of the player making the move.
-        to_grid (Postion): The position to which the move is being made.
-        from_grid (Postion, optional): The position from which the move is being made. Defaults to None.
+        to_grid (Position): The position to which the move is being made.
+        from_grid (Position, optional): The position from which the move is being made. Defaults to None.
         from_pile (int, optional): The pile from which the move is being made. Defaults to None.
   """
   def is_valid(self, player_id, to_grid, from_grid=None, from_pile=None):
@@ -121,11 +121,11 @@ class Game:
     Checks if Valid then executes a move and updates the game state.
     Args:
         player_id (int): The ID of the player making the move.
-        to_grid (Postion): The position to which the move is being made.
-        from_grid (Postion, optional): The position from which the move is being made. Defaults to None.
+        to_grid (Position): The position to which the move is being made.
+        from_grid (Position, optional): The position from which the move is being made. Defaults to None.
         from_pile (int, optional): The pile from which the move is being made. Defaults to None.
   """
-  def do_turn(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
+  def do_turn(self, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> None:
     self.is_valid(player_id, to_grid, from_grid, from_pile)
     if from_pile:
       self.grid[to_grid.x][to_grid.y].push(self.player[player_id].piles[from_pile].pop())
@@ -172,20 +172,20 @@ class Game:
                 # Check if placing a new rock is legal
                 if not self.grid[to_grid_x][to_grid_y].rocks:
                     # Check if placing a new rock is legal
-                    if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y)):
+                    if self.is_valid(self.current_player.player_id, Position(to_grid_x, to_grid_y)):
                         return True
 
                 for from_pile_index in range(3):
                     if not self.player[self.current_player.player_id].piles[from_pile_index].is_empty():
                         # Check if playing from a pile is legal
-                        if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y), from_pile=from_pile_index):
+                        if self.is_valid(self.current_player.player_id, Position(to_grid_x, to_grid_y), from_pile=from_pile_index):
                             return True
 
                 for from_grid_x in range(4):
                     for from_grid_y in range(4):
                         if self.grid[from_grid_x][from_grid_y].rocks and self.grid[from_grid_x][from_grid_y].rocks[-1].id == self.current_player.player_id:
                             # Check if moving a rock from the grid is legal
-                            if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y), Postion(from_grid_x, from_grid_y)):
+                            if self.is_valid(self.current_player.player_id, Position(to_grid_x, to_grid_y), Position(from_grid_x, from_grid_y)):
                                 return True
         return False
 
