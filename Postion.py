@@ -2,9 +2,9 @@ class Postion:
   """
   Represents a position with x and y coordinates.
   """
-
-  x: int
-  y: int
+  
+  _x: int
+  _y: int
 
   def __init__(self, x, y) -> None:
     """
@@ -13,6 +13,9 @@ class Postion:
     Args:
       x (int): The x coordinate.
       y (int): The y coordinate.
+
     """
+    if(x<0 or x>3 or y<0 or y>3):
+      raise Exception("Invalid position")
     self.x = x
     self.y = y
