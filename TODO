@@ -1,0 +1,5 @@
+added check_tie and check_win (before tie) function before doing turn
+mutual agreement withdrawal - tie
+adjust from pile if pile is empty in is valid function
+Write invalid move exception class
+fix invalid moves class
