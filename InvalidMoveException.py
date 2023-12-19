@@ -1,5 +1,3 @@
-#TODO write exceptions for invalid moves
-
 """
     This class is used to raise exceptions for invalid moves.
     The following exceptions are defined:

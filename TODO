@@ -4,3 +4,4 @@ adjust from pile if pile is empty in is valid function
 Write invalid move exception class
 fix invalid moves class
 Test Game class
+define generate all possible moves method in Game class
