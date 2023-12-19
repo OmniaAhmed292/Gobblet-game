@@ -108,20 +108,25 @@ def initialize_pygame():
 
     global turn
     turn = "P1"
+    
+    global ai_1_difficulty, ai_2_difficulty
 
 
 # Load Images
 def load_images():
-    global background_image, back_arrow_img, next_arrow_img
-    image_directory = "D:\\Senior 2\\AI\\AI_Project\\AI_Project\\AI_Project\\Images"
+    global background_image, back_arrow_img
+    # Get the directory of the current script
+    current_directory = os.path.dirname(__file__)
+    # Define the relative path to the 'Images' folder
+    image_directory = os.path.join(current_directory, 'Images')
     background_filename = "background.png"
     back_arrow_filename = "back_arrow.png"
-    next_arrow_filename = "right_arrow.png"
+    
     
     # Define Images path
     background_path = os.path.join(image_directory, background_filename)
     back_arrow_path = os.path.join(image_directory, back_arrow_filename)
-    next_arrow_path = os.path.join(image_directory, next_arrow_filename)
+    
     
     # Load Background image and resize
     background_image = pygame.image.load(background_path)
@@ -131,15 +136,14 @@ def load_images():
     back_arrow_img = pygame.image.load(back_arrow_path)
     back_arrow_img = pygame.transform.scale(back_arrow_img, (40, 40))
 
-    # Load Back arrow image and resize
-    next_arrow_img = pygame.image.load(next_arrow_path)
-    next_arrow_img = pygame.transform.scale(next_arrow_img, (40, 40))
+
 
 # Initialize Fonts
 def initialize_fonts():
     global Game_Name_font, Game_Name, button_font, difficulty_text_font, input_font
     global Player1_Turn_Text, Player1_Turn_Text_font
     global Player2_Turn_Text, Player2_Turn_Text_font
+
     
     Game_Name_font = pygame.font.Font(None, 60)
     Game_Name = Game_Name_font.render("Gobblet Game", True, (0, 0, 0))
@@ -182,7 +186,6 @@ def initialize_buttons():
     human_vs_computer_button = pygame.Rect((WIDTH - button_width) // 2, start_button_y + button_height + button_spacing, button_width, button_height)
     computer_vs_computer_button = pygame.Rect((WIDTH - button_width) // 2, start_button_y + (button_height + button_spacing) * 2, button_width, button_height)
     back_button_rect = pygame.Rect(20, 20, 40, 40)
-    next_button_rect = pygame.Rect(20, 20, 40, 40)
     hard_button = pygame.Rect((WIDTH - button_width_difficulty) // 2, difficulty_button_y, button_width_difficulty, button_height_difficulty)
     easy_button = pygame.Rect((WIDTH - button_width_difficulty) // 2, difficulty_button_y + button_height_difficulty + difficulty_button_spacing, button_width_difficulty, button_height_difficulty)
 
@@ -265,8 +268,6 @@ def Difficulty_Selection():
         # Update display based on mode selection
         screen.blit(background_image, (0, 0))
         screen.blit(back_arrow_img, (20, 20))
-        next_arrow_width, next_arrow_height = next_arrow_img.get_size()
-        screen.blit(next_arrow_img, (WIDTH - next_arrow_width - 20, HEIGHT - next_arrow_height - 20))
 
        
 
@@ -438,7 +439,9 @@ def Draw_White_Gobblets():
     White_Gobblets_Init_Positions()
 
     Display_White_Gobblets()
+    
 
+    pygame.display.flip()
 
 
 def Display_White_Gobblets():
@@ -567,6 +570,8 @@ def Events_Handler():
     
     # Enter Names Global Variables
     global active_input, player1_name, player2_name, player1_input_rect, player2_input_rect
+    
+    global ai_1_difficulty, ai_2_difficulty
 
     mode_selection = "start_menu"  # Default mode
     previous_mode = ""  # Track previous mode
@@ -597,9 +602,9 @@ def Events_Handler():
                         Game_Handler(mode_selection)
                     elif computer_vs_computer_button.collidepoint(event.pos):
                         previous_mode = mode_selection
-                        mode_selection = "computer_vs_computer"  # Transition to Computer vs Computer mode
+                        mode_selection = "ai_1_difficulty_selection"  # Transition to Computer vs Computer Difficulty selection mode
+                        print("Entered Computer V Computer Difficulty Selection mode")
                         Game_Handler(mode_selection)
-
                 elif mode_selection == "Enter_Names":
                     # Handle input fields for player names
                     if player1_input_rect.collidepoint(event.pos):
@@ -623,16 +628,43 @@ def Events_Handler():
                         Game_Handler(mode_selection)
                         
                     elif easy_button.collidepoint(event.pos):
-                        # Handle Human vs Human mode selection
+                        # Handle ai vs Human mode selection
                         previous_mode = mode_selection  # Assign previous mode before changing
                         mode_selection = "easy_ai_vs_human" 
+                        Game_Handler(mode_selection)
+                elif mode_selection == "ai_1_difficulty_selection":
+                    
+                    if hard_button.collidepoint(event.pos):
+                        ai_1_difficulty = "hard"
+                        # Handle ai_vs_ai_difficulty_selection mode selection
+                        previous_mode = mode_selection  # Assign previous mode before changing
+                        mode_selection = "ai_2_difficulty_selection" 
+                        Game_Handler(mode_selection)
+                        
+                    elif easy_button.collidepoint(event.pos):
+                        ai_1_difficulty = "easy"
+                        # Handle ai vs ai mode selection
+                        previous_mode = mode_selection  # Assign previous mode before changing
+                        mode_selection = "ai_2_difficulty_selection" 
+                        Game_Handler(mode_selection) 
+                elif mode_selection == "ai_2_difficulty_selection":
+                    
+                    if hard_button.collidepoint(event.pos):
+                        ai_2_difficulty = "hard"
+                        # Handle ai_vs_ai_difficulty_selection mode selection
+                        previous_mode = mode_selection  # Assign previous mode before changing
+                        mode_selection = "Computer_vs_Computer" 
+                        Game_Handler(mode_selection)
+                        
+                    elif easy_button.collidepoint(event.pos):
+                        ai_2_difficulty = "easy"
+                        # Handle ai vs ai mode selection
+                        previous_mode = mode_selection  # Assign previous mode before changing
+                        mode_selection = "Computer_vs_Computer" 
                         Game_Handler(mode_selection)
                         
                 elif mode_selection == "easy_ai_vs_human" or mode_selection == "hard_ai_vs_human" or mode_selection == "human_vs_human":
                      Move_Human_Goblet()
-                    
-                
-
 
             elif event.type == pygame.KEYDOWN:
                 if mode_selection == "Enter_Names" and active_input:
@@ -673,6 +705,7 @@ def Events_Handler():
 
 def Game_Handler(mode):
 
+    global ai_1_difficulty, ai_2_difficulty
 
     if mode == "start_menu":
 
@@ -698,26 +731,27 @@ def Game_Handler(mode):
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
-
         
-    elif mode == "human_vs_computer":
+    elif mode == "Computer_vs_Computer":
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
-
-
-
-    elif mode == "computer_vs_computer":
-        draw_game_board()
-        Draw_Black_Gobblets()
-        Draw_White_Gobblets()
-
-        move_gobblet(Black_Gobblets_rect[0][1], Table_centers[1][2])
-        move_gobblet(White_Gobblets_rect[0][2], Table_centers[3][1])
-
-        move_gobblet(Black_Gobblets_rect[0][2], Table_centers[0][2])
-        move_gobblet(White_Gobblets_rect[0][1], Table_centers[2][1])
-    
+        pygame.display.set_caption("Game Started")
+        #Handle the Game based on the difficulty of each AI
+        if ai_1_difficulty == "hard" and ai_2_difficulty == "hard":
+            #call the algorithm that handle this case
+            print("hard vs hard")
+        elif ai_1_difficulty == "easy" and ai_2_difficulty == "easy":
+            #call the algorithm that handle this case
+            print("easy vs easy")
+        elif ai_1_difficulty == "easy" and ai_2_difficulty == "hard":
+            #call the algorithm that handle this case
+            print("easy vs hard")
+        elif ai_1_difficulty == "hard" and ai_2_difficulty == "easy":
+            #call the algorithm that handle this case
+            print("hard vs easy")
+            
+  
     elif mode == "ai_vs_human_difficulty_selection":
         Difficulty_Selection()
     
@@ -725,14 +759,24 @@ def Game_Handler(mode):
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        pygame.display.set_caption("Game Started")
         
         
-    elif mode == "hard_ai_vs_human":
+    elif mode == "easy_ai_vs_human":
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        pygame.display.set_caption("Game Started")
+    
+    elif mode == "ai_1_difficulty_selection":
         
-        
+        Difficulty_Selection()
+        pygame.display.set_caption("Difficulty Selection For Player 1 ")
+    
+    elif mode == "ai_2_difficulty_selection":
+
+        Difficulty_Selection()
+        pygame.display.set_caption("Difficulty Selection For Player 2 ")
         
     pygame.display.flip()
 
@@ -747,7 +791,4 @@ if __name__ == "__main__":
 
     pygame.quit()
     sys.exit()
-
-
-
 
