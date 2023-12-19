@@ -19,4 +19,15 @@ class Player:
     self.name = name
     self.id = id
     self.piles = [Pile(True, id),Pile(True, id),Pile(True, id)]
+
+  """
+  checks if the player's pile is empty
+  returns:
+    bool: True if the player's pile is empty, False otherwise
+  """
+  def is_pile_empty(self):
+    for pile in self.piles:
+      if pile.size() != 0:
+        return False
+    return True
     
