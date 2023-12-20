@@ -130,7 +130,28 @@ class TestCheckWin(unittest.TestCase):
             self.game.grid[0][i].push(Rock(i+1, 0))
         self.assertEqual(self.game.check_win(), 0)
     
-    
+class TestGame(unittest.TestCase):
+    def test_generate_possible_moves(self):
+        game = Game("Player 1", "Player 2")
+        possible_moves = game.generate_possible_moves(0)
+        self.assertEqual(len(possible_moves), 48)
+
+    def test_no_possible_moves(self):
+        game = Game("Player 1", "Player 2")
+        # Fill the grid with larger rocks on top of smaller ones
+        for i in range(4):
+            for j in range(4):
+                game.grid[i][j].push(Rock(2, 0))
+                game.grid[i][j].push(Rock(3, 1))
+        # Empty the piles
+        for pile in game.player[0].piles:
+            while pile.rocks:
+                pile.pop()
+        for pile in game.player[1].piles:
+            while pile.rocks:
+                pile.pop()
+        possible_moves = game.generate_possible_moves(0)
+        self.assertEqual(len(possible_moves), 0)    
     
 
 

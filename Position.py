@@ -1,6 +1,14 @@
 class Position:
   """
   Represents a position with x and y coordinates.
+
+  Attributes:
+    x (int): The x coordinate.
+    y (int): The y coordinate.
+  
+  methods:
+    __init__(self, x: int, y: int) -> None:
+      Initializes a new instance of the Position class.
   """
   
   _x: int

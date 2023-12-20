@@ -4,6 +4,17 @@ from Rock import Rock
 class Pile:
   """
   Represents a pile of rocks in the Gobblet game.
+  
+  attributes:
+    rocks (list[Rock]): stack of rocks sorted from large to small
+
+  methods:
+    __init__(self, is_player: bool = False, id: any = None) -> None:
+      Initializes a new instance of the Pile class.
+    push(self, rock: Rock) -> None:
+      Pushes a rock onto the pile.
+    pop(self) -> Rock:
+      Removes and returns the topmost rock from the pile.
   """
 
   rocks: list[Rock]   # stack of rocks sorted from large to small

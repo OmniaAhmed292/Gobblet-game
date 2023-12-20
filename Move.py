@@ -1,7 +1,18 @@
-"""
-    This module contains the Move class, which is used to represent a move in the game.
-"""
 class Move:
+    """
+    This module contains the Move class, which is used to represent a move in the game.
+    Attributes:
+        player_id (int): The ID of the player making the move.
+        to_grid (Position): The position to which the move is being made.
+        from_grid (Position, optional): The position from which the move is being made. Defaults to None.
+        from_pile (int, optional): The pile from which the move is being made. Defaults to None.
+    
+    methods:
+        __init__(self, player_id: int, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> None:
+            Initializes a new Move object.
+        __eq__(self, other: Move) -> bool:
+            redifining the equality operator for Move class.
+    """
     
     def __init__(self, player_id, to_grid, from_grid=None, from_pile=None):
         """

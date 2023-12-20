@@ -1,4 +1,5 @@
-"""
+class InvalidMoveException(Exception):
+    """
     This class is used to raise exceptions for invalid moves.
     The following exceptions are defined:
         - MoveFromBothGridAndPileException: The move is from both a grid and a pile.
@@ -10,8 +11,10 @@
         - MoveToSmallerRockException: The move is to a Position with a smaller rock.
         - MoveToSamePositionException: The move is to the same position.
         - MoveWithNo3RocksException: The move is on another's player's rock and they don't have 3 rocks in a row.
-"""
-class InvalidMoveException(Exception):
+
+    Attributes:
+        message (str): explanation of the error
+    """
     def __init__(self, message):
         super().__init__(message)
 

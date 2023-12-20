@@ -4,6 +4,17 @@ from Pile import Pile
 class Player:
   """
   Represents a player in the Gobblet game.
+
+  Attributes:
+    name (str): The name of the player.
+    piles (list[Pile]): A list of the player's piles.
+    id (int): The ID of the player.
+
+  methods:
+    __init__(self, name: str, id: int) -> None:
+      Initializes a new instance of the Player class.
+    is_pile_empty(self) -> bool:
+      checks if the player's pile is empty
   """
   name: str
   piles: list[Pile]

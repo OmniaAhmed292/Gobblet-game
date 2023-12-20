@@ -1,12 +1,3 @@
-"""
-    Game class should be responsible for:
-
-    * Maintaining state of pieces on board and in reserves
-    * Executing player moves while enforcing rules
-    * Validating move legality
-    * Checking win conditions
-    * Providing available moves for current player
-"""
 from Pile import Pile
 from Player import Player
 from Position import Position
@@ -14,10 +5,35 @@ from Move import Move
 from InvalidMoveException import *
 
 class Game:
+    """
+    The Game class represents a game of Gobblet Gobblers. and is resoponsible for
+    * Maintaining state of pieces on board and in reserves
+    * Executing player moves while enforcing rules
+    * Validating move legality
+    * Checking win conditions
+    * Providing available moves for current player
+
+    Attributes:
+        player (list[Player]): A list of the two players in the game.
+        grid (list[list[Pile]]): A 4x4 grid representing the game board.
+        move_history (list[Move]): A list of all moves made in the game.
+        possible_moves (list[Move]): A list of all possible moves for the current player.
+
+    Methods:
+        print_grid(): Prints the current state of the game board.
+        is_valid(move: Move): Checks if a move is valid.
+        do_turn(move: Move): Executes a move.
+        check_win(): Checks if the current state of the game is a win.
+        has_legalMoves(): Checks if any legal move is available for the current player.
+        check_three_repetitions(): Checks if the current state of the game has three cycles of repeated moves.
+        check_tie(): Checks if the current state of the game is a tie.
+        generate_possible_moves(player_id): Generates a list of all possible moves for a player.
+    """
   
     player: list[Player]
     grid: list[list[Pile]]
     move_history: list[Move]
+    possible_moves: list[Move]
     
 
     
@@ -36,6 +52,7 @@ class Game:
             [Pile(),Pile(),Pile(),Pile()]
             ]
         self.move_history = []  # Changed from self.game_history = []
+        self.possible_moves = []
 
     
     def print_grid(self) -> None:
@@ -92,6 +109,9 @@ class Game:
           self.grid[move.to_grid.x][move.to_grid.y].push(self.player[move.player_id].piles[move.from_pile].pop())
         elif move.from_grid:
           self.grid[move.to_grid.x][move.to_grid.y].push(self.grid[move.from_grid.x][move.from_grid.y].pop())
+        
+        # Reset the possible moves list after a move has been made
+        self.possible_moves = []
 
 
     def check_win(self):
@@ -129,26 +149,8 @@ class Game:
         Returns:
             True if a legal move is available, False otherwise.
         """        
-        for to_grid_x in range(4):
-            for to_grid_y in range(4):
-                # Check if placing a new rock is legal
-                if not self.grid[to_grid_x][to_grid_y].rocks:
-                    # Check if placing a new rock is legal
-                    if self.is_valid(self.current_player.player_id, Position(to_grid_x, to_grid_y)):
-                        return True
-
-                for from_pile_index in range(3):
-                    if not self.player[self.current_player.player_id].piles[from_pile_index].is_empty():
-                        # Check if playing from a pile is legal
-                        if self.is_valid(self.current_player.player_id, Position(to_grid_x, to_grid_y), from_pile=from_pile_index):
-                            return True
-
-                for from_grid_x in range(4):
-                    for from_grid_y in range(4):
-                        if self.grid[from_grid_x][from_grid_y].rocks and self.grid[from_grid_x][from_grid_y].rocks[-1].id == self.current_player.player_id:
-                            # Check if moving a rock from the grid is legal
-                            if self.is_valid(self.current_player.player_id, Position(to_grid_x, to_grid_y), Position(from_grid_x, from_grid_y)):
-                                return True
+        if self.possible_moves and len(self.possible_moves) > 0:
+            return True
         return False
 
 
@@ -179,4 +181,42 @@ class Game:
             return True
         return False
 
-    #def possible_moves(self, player_id):
+    def generate_possible_moves(self, player_id) -> list[Move]:
+        """
+        Generates a list of all possible moves for the given player.
+        Args:
+            player_id (int): The ID of the player to generate moves for.
+        Returns:
+            A list of all possible moves for the given player.
+        """
+        # Check if the list of possible moves has already been generated
+        if self.possible_moves:
+            return self.possible_moves
+
+        #check all combinations of moves to grid
+        for to_grid_x in range(4):
+            for to_grid_y in range(4):
+
+                #check all combinations of moves from piles
+                for from_pile_index in range(3):
+                    # Check if playing from a pile is legal
+                    try:
+                        move = Move(player_id, Position(to_grid_x, to_grid_y), None, from_pile=from_pile_index)
+                        self.is_valid(move)
+                        self.possible_moves.append(move)
+                    except:
+                    #if not pass
+                        pass
+                #check all combinations of moves from grid
+                for from_grid_x in range(4):
+                    for from_grid_y in range(4):
+                        # Check if moving a rock from the grid is legal
+                        try:
+                            move = Move(player_id, Position(to_grid_x, to_grid_y), Position(from_grid_x, from_grid_y), None)
+                            self.is_valid(move)
+                            self.possible_moves.append(move)
+                        except:
+                            pass
+                        
+                            
+        return self.possible_moves
