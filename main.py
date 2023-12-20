@@ -24,19 +24,21 @@ def initialize_pygame():
 
 # Load Images
 def load_images():
-    global background_image, back_arrow_img
+    global background_image, back_arrow_img ,black_gobblet_path, white_gobblet_path
     # Get the directory of the current script
     current_directory = os.path.dirname(__file__)
     # Define the relative path to the 'Images' folder
     image_directory = os.path.join(current_directory, 'Images')
     background_filename = "background.png"
     back_arrow_filename = "back_arrow.png"
-    
+    black_gobblet_filename = "black_gobblet.png"
+    white_gobblet_filename = "white_gobblet.png"
     
     # Define Images path
     background_path = os.path.join(image_directory, background_filename)
     back_arrow_path = os.path.join(image_directory, back_arrow_filename)
-    
+    black_gobblet_path = os.path.join(image_directory, black_gobblet_filename)
+    white_gobblet_path = os.path.join(image_directory, white_gobblet_filename)
     
     # Load Background image and resize
     background_image = pygame.image.load(background_path)
@@ -281,7 +283,7 @@ def Draw_Black_Gobblets():
 
     for x in range (4):
         for y in range (3):
-            Black_Gobblets[x][y] = pygame.image.load("C:\\Users\\win 10\\Desktop\\AI_Project\\AI_Project\\AI_Project\\AI_Project\\Images\\black_gobblet.png")  
+            Black_Gobblets[x][y] = pygame.image.load(black_gobblet_path)  
  
 
     for i in range (4):
@@ -336,7 +338,7 @@ def Draw_White_Gobblets():
 
     for x in range (4):
         for y in range (3):
-            White_Gobblets[x][y] = pygame.image.load("C:\\Users\\win 10\\Desktop\\AI_Project\\AI_Project\\AI_Project\\AI_Project\\Images\\white_gobblet.png")  
+            White_Gobblets[x][y] = pygame.image.load(white_gobblet_path)  
  
 
     for i in range (4):
