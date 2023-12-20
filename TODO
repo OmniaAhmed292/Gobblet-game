@@ -1,5 +1,5 @@
 1- added check_tie and check_win (before tie) function before doing turn
 2- mutual agreement withdrawal - tie
-3- Test Game class
-4- define generate all possible moves method in Game class and merge it with has valid moves - make  sure to call it in the do turn function to avoid repeated expensive calls
-5- check is able to win error
+3- finish all Game class tests; remaining methods: check tie, check has three repititions
+4- check is able to win error appearing in tests
+5- fix game class to alternate player's turns automatically and recieve starting player on initialization

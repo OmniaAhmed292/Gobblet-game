@@ -130,31 +130,77 @@ class TestCheckWin(unittest.TestCase):
             self.game.grid[0][i].push(Rock(i+1, 0))
         self.assertEqual(self.game.check_win(), 0)
     
-class TestGame(unittest.TestCase):
+class Test_generate_possible_moves(unittest.TestCase):
+    def setUp(self):
+        self.game = Game("Player 1", "Player 2")  # Initialize a new game
+
     def test_generate_possible_moves(self):
-        game = Game("Player 1", "Player 2")
-        possible_moves = game.generate_possible_moves(0)
+        possible_moves = self.game.generate_possible_moves(0)
         self.assertEqual(len(possible_moves), 48)
 
     def test_no_possible_moves(self):
-        game = Game("Player 1", "Player 2")
+        self.game = Game("Player 1", "Player 2")
         # Fill the grid with larger rocks on top of smaller ones
         for i in range(4):
             for j in range(4):
-                game.grid[i][j].push(Rock(2, 0))
-                game.grid[i][j].push(Rock(3, 1))
+                self.game.grid[i][j].push(Rock(2, 0))
+                self.game.grid[i][j].push(Rock(3, 1))
         # Empty the piles
-        for pile in game.player[0].piles:
+        for pile in self.game.player[0].piles:
             while pile.rocks:
                 pile.pop()
-        for pile in game.player[1].piles:
+        for pile in self.game.player[1].piles:
             while pile.rocks:
                 pile.pop()
-        possible_moves = game.generate_possible_moves(0)
-        self.assertEqual(len(possible_moves), 0)    
+        possible_moves = self.game.generate_possible_moves(0)
+        self.assertEqual(len(possible_moves), 0)   
     
 
+class Test_has_legalMoves(unittest.TestCase):
+    def setUp(self):
+        self.game = Game("Player 1", "Player 2")  # Initialize a new game
 
+    def test_has_legalMoves_when_possible_moves_is_None(self):
+        self.game.possible_moves = None
+        self.assertTrue(self.game.has_legalMoves(0))
+
+    def test_has_legalMoves_when_possible_moves_is_empty(self):
+        self.game.possible_moves = []
+        self.assertFalse(self.game.has_legalMoves(0))
+
+    def test_has_legalMoves_when_possible_moves_is_not_empty(self):
+        self.game.possible_moves = [Move(0, Position(0, 0), None, 0)]  # Assume this is a valid move
+        self.assertTrue(self.game.has_legalMoves(0))
+    
+    #integration tests
+        
+    def test_has_legalMoves_integrated_with_generate_possible_moves(self):
+       # Generate possible moves for the current player
+       self.game.possible_moves = self.game.generate_possible_moves(0)
+       self.assertTrue(self.game.has_legalMoves(0))  # There should be possible moves, so it should return True
+
+    def test_has_legalMoves_integrated_with_generate_possible_moves_when_no_moves(self):
+         # Fill the grid with larger rocks on top of smaller ones
+         for i in range(4):
+              for j in range(4):
+                self.game.grid[i][j].push(Rock(2, 0))
+                self.game.grid[i][j].push(Rock(3, 1))
+         # Empty the piles
+         for pile in self.game.player[0].piles:
+              while pile.rocks:
+                pile.pop()
+         for pile in self.game.player[1].piles:
+              while pile.rocks:
+                pile.pop()
+         # Generate possible moves for the current player
+         self.game.possible_moves = self.game.generate_possible_moves(0)
+         self.assertFalse(self.game.has_legalMoves(0))
+        
+    def test_has_legalMoves_integrated_with_do_turn(self):
+        # Execute a move
+        self.game.do_turn(Move(0, Position(0, 0), None, 0))
+        # Check if there are any possible moves left
+        self.assertTrue(self.game.has_legalMoves(0))
  
 
 ##    def test_check_three_repetitions(self):

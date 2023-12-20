@@ -111,8 +111,7 @@ class Game:
           self.grid[move.to_grid.x][move.to_grid.y].push(self.grid[move.from_grid.x][move.from_grid.y].pop())
         
         # Reset the possible moves list after a move has been made
-        self.possible_moves = []
-
+        self.possible_moves = None
 
     def check_win(self):
         """
@@ -143,13 +142,16 @@ class Game:
             return self.grid[0][3].rocks[-1].id
 
 
-    def has_legalMoves(self):
+    def has_legalMoves(self, player_id):
         """
         Checks if any legal move is available for the current player.
         Returns:
             True if a legal move is available, False otherwise.
-        """        
-        if self.possible_moves and len(self.possible_moves) > 0:
+        """ 
+
+        if self.possible_moves is None:
+            self.possible_moves = self.generate_possible_moves(player_id)
+        if len(self.possible_moves) > 0:
             return True
         return False
 
@@ -192,6 +194,9 @@ class Game:
         # Check if the list of possible moves has already been generated
         if self.possible_moves:
             return self.possible_moves
+        
+        # Initialize possible_moves as an empty list
+        self.possible_moves = []
 
         #check all combinations of moves to grid
         for to_grid_x in range(4):
