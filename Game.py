@@ -11,12 +11,13 @@ from Pile import Pile
 from Player import Player
 from Position import Position
 from InvalidMoveException import *
+from Move import Move
 
 class Game:
   
     player: list[Player]
     grid: list[list[Pile]]
-    game_history: list[list[list[Pile]]]
+    move_history: list[Move]
     
 
     """
@@ -53,30 +54,25 @@ class Game:
           from_grid (Position, optional): The position from which the move is being made. Defaults to None.
           from_pile (int, optional): The pile from which the move is being made. Defaults to None.
     """
-    def is_valid(self, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> bool:
-        if from_grid != None and from_pile != None:
-            raise MoveFromBothGridAndPileException("You can either play from the grid or your piles, not both.")
+    def is_valid(self, move: Move) -> bool:
 
-        if from_grid == None and from_pile == None:
-            raise MoveFromNeitherGridNorPileException("You should play from either the grid or your piles at least.")
-
-        if from_grid and self.grid[from_grid.x][from_grid.y].rocks and self.grid[from_grid.x][from_grid.y].rocks[-1].id != player_id:
+        if move.from_grid and self.grid[move.from_grid.x][move.from_grid.y].rocks and self.grid[move.from_grid.x][move.from_grid.y].rocks[-1].id != move.player_id:
             raise MoveFromAnotherPlayerException("You cannot play from another player's rocks.")
 
-        if from_grid and not self.grid[from_grid.x][from_grid.y].rocks:
+        if move.from_grid and not self.grid[move.from_grid.x][move.from_grid.y].rocks:
             raise MoveFromEmptyGridException("You cannot play from an empty cell.")
         
-        if from_grid and from_grid.x==to_grid.x and from_grid.y==to_grid.y:
+        if move.from_grid and move.from_grid.x == move.to_grid.x and move.from_grid.y == move.to_grid.y:
             raise MoveToSamePositionException("You cannot play on the same cell.")
         
-        if from_grid and self.grid[to_grid.x][to_grid.y].rocks and self.grid[from_grid.x][from_grid.y].rocks[-1].size <= self.grid[to_grid.x][to_grid.y].rocks[-1].size:
+        if move.from_grid and self.grid[move.to_grid.x][move.to_grid.y].rocks and self.grid[move.from_grid.x][move.from_grid.y].rocks[-1].size <= self.grid[move.to_grid.x][move.to_grid.y].rocks[-1].size:
             raise MoveToSmallerRockException("You cannot play a smaller rock on top of a larger one.")
         
-        if from_pile!= None and self.player[player_id].piles[from_pile].rocks and self.grid[to_grid.x][to_grid.y].rocks and self.player[player_id].piles[from_pile].rocks[-1].size <= self.grid[to_grid.x][to_grid.y].rocks[-1].size:
+        if move.from_pile!= None and self.player[move.player_id].piles[move.from_pile].rocks and self.grid[move.to_grid.x][move.to_grid.y].rocks and self.player[move.player_id].piles[move.from_pile].rocks[-1].size <= self.grid[move.to_grid.x][move.to_grid.y].rocks[-1].size:
             raise MoveToSmallerRockException("You cannot play a smaller rock on top of a larger one.")
        
 
-        if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id != player_id and not self.is_able_to_win(to_grid):
+        if self.grid[move.to_grid.x][move.to_grid.y].rocks and self.grid[move.to_grid.x][move.to_grid.y].rocks[-1].id != move.player_id and not self.is_able_to_win(move.to_grid):
             raise MoveWithNo3RocksException("You cannot play on another player's rock unless they have 3 in a row")
         return True
 
@@ -89,18 +85,16 @@ class Game:
             from_grid (Position, optional): The position from which the move is being made. Defaults to None.
             from_pile (int, optional): The pile from which the move is being made. Defaults to None.
     """
-    def do_turn(self, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> None:
+    def do_turn(self, move: Move) -> None:
         #TODO if you are using true or false instead of exceptions, you can use the following code to catch errors
-
        
-        self.is_valid(player_id, to_grid, from_grid, from_pile)
+        self.is_valid(move)
          
-
-        self.game_history.append(self.grid)
-        if from_pile != None:
-          self.grid[to_grid.x][to_grid.y].push(self.player[player_id].piles[from_pile].pop())
-        elif from_grid:
-          self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
+        self.move_history.append(move)
+        if move.from_pile != None:
+          self.grid[move.to_grid.x][move.to_grid.y].push(self.player[move.player_id].piles[move.from_pile].pop())
+        elif move.from_grid:
+          self.grid[move.to_grid.x][move.to_grid.y].push(self.grid[move.from_grid.x][move.from_grid.y].pop())
 
     """
     Checks if the current state of the game if it is a win
@@ -166,10 +160,10 @@ class Game:
     """
     def check_three_repetitions(self):
         # Check if it's still early in the game
-        if len(self.game_history) < 6:
+        if len(self.move_history) < 6:
             return False
         # Check for three consecutive identical entries in the history
-        if self.game_history[-1] == self.game_history[-4] and self.game_history[-2] == self.game_history[-5] and self.game_history[-3] == self.game_history[-6]:
+        if self.move_history[-1] == self.move_history[-4] and self.move_history[-2] == self.move_history[-5] and self.move_history[-3] == self.move_history[-6]:
             return True
         return False
 

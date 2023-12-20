@@ -1,7 +1,4 @@
-added check_tie and check_win (before tie) function before doing turn
-mutual agreement withdrawal - tie
-adjust from pile if pile is empty in is valid function
-Write invalid move exception class
-fix invalid moves class
-Test Game class
-define generate all possible moves method in Game class
+1- added check_tie and check_win (before tie) function before doing turn
+2- mutual agreement withdrawal - tie
+3- Test Game class
+4- define generate all possible moves method in Game class and merge it with has valid moves - make  sure to call it in the do turn function to avoid repeated expensive calls
