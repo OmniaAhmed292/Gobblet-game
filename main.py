@@ -1,6 +1,3 @@
-'''Ideas about main
-
-'''
 import pygame
 import sys
 import os
@@ -8,93 +5,6 @@ import math
 from Game import Game
 from Postion import Postion
 
-
-# # Imports
-# #import pygame
-# from AIPlayer import AIPlayer
-# from HumanPlayer import HumanPlayer
-# from GameView import GameView
-
-
-
-
-def main():
-    game1 = Game("Hanan", "omnia")
-    game1.print_grid()
-    
-    #pile  # 4, 4, 4
-    game1.do_turn(0, Postion(1, 1), from_pile=3) #pile : 4, 4, 3
-    game1.print_grid()
-    game1.do_turn(0, Postion(1, 2), from_pile=1) #pile: 3, 4,3
-    game1.print_grid()
-    game1.do_turn(0, Postion(1, 3), from_pile=3) #pile: 3,4,2
-    game1.print_grid()
-    game1.do_turn(0, Postion(1, 0), from_pile=2) #pile: 3,3,2 
-    game1.print_grid()
-    '''
-    game1.do_turn(0, Postion(1, 2), from_grid=Postion(1, 1))
-    game1.print_grid()
-    game1.do_turn(0, Postion(1, 0), from_pile=2)
-    game1.print_grid() '''
-
-#     # Create classes
-#     game_view = GameView()
-#     ai_player = AIPlayer("black", difficulty=2)
-#     human_player = HumanPlayer("white")
-#
-#     # Create game class to track state
-#     game = Game()
-#
-#     # Select game mode
-#     mode = input("Select game mode (1=human vs human, 2=human vs AI, 3=AI vs AI): ")
-#
-#     if mode == '1':
-#         player1 = human_player
-#         player2 = HumanPlayer("black")
-#     elif mode == '2':
-#         player1 = human_player
-#         player2 = ai_player
-#     else:
-#         player1 = ai_player.clone("white")
-#         player2 = ai_player
-# # Game loop
-#     current_player = player1
-#
-#
-#     while True:
-#
-#         # Draw current game state
-#         game_view.draw_board(game.board)
-#         game_view.draw_pieces(game.pieces)
-#
-#         if current_player == ai_player:
-#             # AI's turn
-#             move = ai_player.get_move(game)
-#             game.execute_move(move)
-#             game_view.animate_move(move)
-#
-#         else:
-#             # Human's turn
-#             move = human_player.get_move(game)
-#             if game.validate_move(move):
-#                 game.execute_move(move)
-#                 game_view.animate_move(move)
-#
-#         # Check end game conditions
-#         if game.check_win(current_player):
-#             game_view.show_game_over(current_player)
-#             break
-#
-#         # Swap current player
-#         if current_player == ai_player:
-#             current_player = human_player
-#         else:
-#             current_player = ai_player
-#
-#     print("Game over! Winner:", winner)
-
-#if __name__ == "__main__":
-    #main()
 
 # Initialize Pygame
 def initialize_pygame():
@@ -371,7 +281,7 @@ def Draw_Black_Gobblets():
 
     for x in range (4):
         for y in range (3):
-            Black_Gobblets[x][y] = pygame.image.load("D:\\Senior 2\\AI\\AI_Project\\AI_Project\\AI_Project\\Images\\black_gobblet.png")  
+            Black_Gobblets[x][y] = pygame.image.load("C:\\Users\\win 10\\Desktop\\AI_Project\\AI_Project\\AI_Project\\AI_Project\\Images\\black_gobblet.png")  
  
 
     for i in range (4):
@@ -397,7 +307,6 @@ def Display_Black_Gobblets():
             # Display the images on the screen
             screen.blit(Black_Gobblets[3 - x][2 - y], Black_Gobblets_rect[3 - x][2 - y])
 
-    pygame.display.flip()
 
 
 
@@ -427,7 +336,7 @@ def Draw_White_Gobblets():
 
     for x in range (4):
         for y in range (3):
-            White_Gobblets[x][y] = pygame.image.load("D:\\Senior 2\\AI\\AI_Project\\AI_Project\\AI_Project\\Images\\white_gobblet.png")  
+            White_Gobblets[x][y] = pygame.image.load("C:\\Users\\win 10\\Desktop\\AI_Project\\AI_Project\\AI_Project\\AI_Project\\Images\\white_gobblet.png")  
  
 
     for i in range (4):
@@ -451,7 +360,22 @@ def Display_White_Gobblets():
             # Display the images on the screen
             screen.blit(White_Gobblets[3 - x][2 - y], White_Gobblets_rect[3 - x][2 - y])
 
+    
+
+
+
+
+def Display_Gobblets():
+
+    for x in range (4):
+        for y in range (3):
+            # Display the images on the screen
+            screen.blit(White_Gobblets[3 - x][2 - y], White_Gobblets_rect[3 - x][2 - y])
+            screen.blit(Black_Gobblets[3 - x][2 - y], Black_Gobblets_rect[3 - x][2 - y])
+
     pygame.display.flip()
+
+
 
 
     
@@ -459,24 +383,40 @@ def move_gobblet(Gobblet_rect, grid_centers_tuple):
     
     draw_game_board()
 
+
+
     for x in range (4):
         for y in range (3):
 
             if(Gobblet_rect == Black_Gobblets_rect[x][y]):
-                Black_Gobblets_rect[x][y].x = grid_centers_tuple[0]
-                Black_Gobblets_rect[x][y].y = grid_centers_tuple[1]
+                Black_Gobblets_rect[x][y].x = grid_centers_tuple[0] + x * 10
+                Black_Gobblets_rect[x][y].y = grid_centers_tuple[1] + x * 10
 
-                Display_Black_Gobblets()
-                Display_White_Gobblets()
+                Display_Gobblets()
+                
 
             elif(Gobblet_rect == White_Gobblets_rect[x][y]):
-                White_Gobblets_rect[x][y].x = grid_centers_tuple[0]
-                White_Gobblets_rect[x][y].y = grid_centers_tuple[1]
 
-                Display_Black_Gobblets()
-                Display_White_Gobblets()
+                if(x == 0):
+                    White_Gobblets_rect[x][y].x = grid_centers_tuple[0] - 7
+                    White_Gobblets_rect[x][y].y = grid_centers_tuple[1] - 7
+
+                elif(x == 1):
+                    White_Gobblets_rect[x][y].x = grid_centers_tuple[0] + 4
+                    White_Gobblets_rect[x][y].y = grid_centers_tuple[1] + 4
+
+                elif(x == 2):
+                    White_Gobblets_rect[x][y].x = grid_centers_tuple[0] + 11
+                    White_Gobblets_rect[x][y].y = grid_centers_tuple[1] + 11
+
+                elif(x == 3):
+                    White_Gobblets_rect[x][y].x = grid_centers_tuple[0] + 22
+                    White_Gobblets_rect[x][y].y = grid_centers_tuple[1] + 22
+
+                Display_Gobblets()
 
 
+    
     pygame.display.flip()
 
 
@@ -488,6 +428,10 @@ def Move_Human_Goblet():
     # First click: select the image
     mouse_pos = pygame.mouse.get_pos()
     
+    global pile_no, game1
+
+  
+    
     for x in range (4):
         for y in range (3):
 
@@ -496,11 +440,13 @@ def Move_Human_Goblet():
                 if(turn == "P1"):
                     if (Black_Gobblets_rect[3- x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
+                        pile_no = (2 - y)
                         clicked = True
 
                 elif(turn == "P2"):
                     if (White_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = White_Gobblets_rect[3 - x][2- y]
+                        pile_no = (2 - y)
                         clicked = True
 
             elif(mode_selection == "hard_ai_vs_human"):
@@ -548,6 +494,20 @@ def Move_Human_Goblet():
 
                 if selected_image:
                     move_gobblet(selected_image, Table_centers[i][j])
+
+                    if(turn == "P1"):
+                        game1.do_turn(0, Postion(j, i), from_pile=pile_no)
+                        var1, var2 = game1.check_win()
+                        print(var1, var2)
+
+
+                    elif(turn == "P2"):
+                        game1.do_turn(1, Postion(j, i), from_pile=pile_no)
+                        var1, var2 = game1.check_win()
+                        print(var1, var2)
+
+                    game1.print_grid()
+
                     clicked = False
                     selected_image = None
 
@@ -729,13 +689,19 @@ def Game_Handler(mode):
     
     elif mode == "human_vs_human":
         draw_game_board()
+        pygame.display.flip()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        global game1
+        game1 = Game("Hanan", "omnia")
+        pygame.display.flip()
         
     elif mode == "Computer_vs_Computer":
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        pygame.display.flip()
+
         pygame.display.set_caption("Game Started")
         #Handle the Game based on the difficulty of each AI
         if ai_1_difficulty == "hard" and ai_2_difficulty == "hard":
@@ -759,6 +725,8 @@ def Game_Handler(mode):
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        pygame.display.flip()
+
         pygame.display.set_caption("Game Started")
         
         
@@ -766,6 +734,8 @@ def Game_Handler(mode):
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        pygame.display.flip()
+
         pygame.display.set_caption("Game Started")
     
     elif mode == "ai_1_difficulty_selection":
@@ -789,6 +759,12 @@ if __name__ == "__main__":
     initialize_buttons()
     Events_Handler()
 
+    game1 = Game("Hanan", "omnia")
+    game1.print_grid()
+    
+
+
     pygame.quit()
     sys.exit()
+
 
