@@ -1,17 +1,17 @@
-'''
-Game class should be responsible for:
+"""
+    Game class should be responsible for:
 
-* Maintaining state of pieces on board and in reserves
-* Executing player moves while enforcing rules
-* Validating move legality
-* Checking win conditions
-* Providing available moves for current player
-'''
+    * Maintaining state of pieces on board and in reserves
+    * Executing player moves while enforcing rules
+    * Validating move legality
+    * Checking win conditions
+    * Providing available moves for current player
+"""
 from Pile import Pile
 from Player import Player
 from Position import Position
-from InvalidMoveException import *
 from Move import Move
+from InvalidMoveException import *
 
 class Game:
   
@@ -20,13 +20,14 @@ class Game:
     move_history: list[Move]
     
 
-    """
-      Initializes a new instance of the Game class.
-      Args:
-        player1_name (str): The name of the first player.
-        player2_name (str): The name of the second player.
-      """
+    
     def __init__(self, player1_name, player2_name) -> None:
+        """
+            Initializes a new instance of the Game class.
+            Args:
+            player1_name (str): The name of the first player.
+            player2_name (str): The name of the second player.
+        """
         self.player = [Player(player1_name, 0), Player(player2_name, 1)]
         self.grid = [
             [Pile(),Pile(),Pile(),Pile()],
@@ -36,25 +37,24 @@ class Game:
             ]
         self.move_history = []  # Changed from self.game_history = []
 
-    """
-      Prints the current state of the game board.
-    """
+    
     def print_grid(self) -> None:
+      """
+      Prints the current state of the game board.
+      """
       for row in self.grid:
         for cell in row:
           print(cell.rocks[-1].size if cell.rocks else '#', end=' ')
         print("\n")
       print("\n")
 
-    """
-      Checks if the move is valid.
-      Args:
-          player_id (int): The ID of the player making the move.
-          to_grid (Position): The position to which the move is being made.
-          from_grid (Position, optional): The position from which the move is being made. Defaults to None.
-          from_pile (int, optional): The pile from which the move is being made. Defaults to None.
-    """
+    
     def is_valid(self, move: Move) -> bool:
+        """
+            Checks if the move is valid.
+            Args:
+                move (Move): The move to check.
+        """
 
         if move.from_grid and self.grid[move.from_grid.x][move.from_grid.y].rocks and self.grid[move.from_grid.x][move.from_grid.y].rocks[-1].id != move.player_id:
             raise MoveFromAnotherPlayerException("You cannot play from another player's rocks.")
@@ -76,16 +76,13 @@ class Game:
             raise MoveWithNo3RocksException("You cannot play on another player's rock unless they have 3 in a row")
         return True
 
-    """
-        Checks if Valid then executes a move and updates the game state while adding older state to history.
-        raises an exception if the move is invalid.
-        Args:
-            player_id (int): The ID of the player making the move.
-            to_grid (Position): The position to which the move is being made.
-            from_grid (Position, optional): The position from which the move is being made. Defaults to None.
-            from_pile (int, optional): The pile from which the move is being made. Defaults to None.
-    """
+
     def do_turn(self, move: Move) -> None:
+        """
+            Executes the given move.
+            Args:
+                move (Move): The move to execute.
+        """
         #TODO if you are using true or false instead of exceptions, you can use the following code to catch errors
        
         self.is_valid(move)
@@ -96,12 +93,13 @@ class Game:
         elif move.from_grid:
           self.grid[move.to_grid.x][move.to_grid.y].push(self.grid[move.from_grid.x][move.from_grid.y].pop())
 
-    """
-    Checks if the current state of the game if it is a win
-    Returns:
-        The ID of the player who won the game if there is a winner, None otherwise
-    """
+
     def check_win(self):
+        """
+        Checks if the current state of the game if it is a win
+        Returns:
+            The ID of the player who won the game if there is a winner, None otherwise
+        """
         cnt = 0
         for i in range(4):
             for j in range(4):
@@ -124,12 +122,13 @@ class Game:
         if all(self.grid[i][3 - i].rocks and self.grid[i][3 - i].rocks[-1].id == self.grid[0][3].rocks[-1].id for i in range(4)):
             return self.grid[0][3].rocks[-1].id
 
-    """
-    Checks if any legal move is available for the current player.
-    Returns:
-        True if a legal move is available, False otherwise.
-    """
+
     def has_legalMoves(self):
+        """
+        Checks if any legal move is available for the current player.
+        Returns:
+            True if a legal move is available, False otherwise.
+        """        
         for to_grid_x in range(4):
             for to_grid_y in range(4):
                 # Check if placing a new rock is legal
@@ -152,13 +151,14 @@ class Game:
                                 return True
         return False
 
-    """
-    Checks if the current state of the game has three repetitions of identical moves.
 
-    Returns:
-        True if three repetitions are found, False otherwise.
-    """
     def check_three_repetitions(self):
+        """
+        Checks if the current state of the game has three cycles of repeated moves.
+
+        Returns:
+            True if three repetitions are found, False otherwise.
+        """
         # Check if it's still early in the game
         if len(self.move_history) < 6:
             return False
@@ -167,12 +167,13 @@ class Game:
             return True
         return False
 
-    """
-      Checks if the current state of the game has three repetitions of identical moves.
-      Returns:
-          True if three repetitions are found, False otherwise.
-    """
+
     def check_tie(self): 
+        """
+          Checks if the current state of the game has three repetitions of identical moves.
+          Returns:
+              True if three repetitions are found, False otherwise.
+        """
         #it's been three cycling moves with no winner or there are no legal moves left
         if self.check_three_repetitions() or (not self.has_legalMoves()):
             return True
