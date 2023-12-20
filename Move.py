@@ -1,7 +1,7 @@
 """
     This module contains the Move class, which is used to represent a move in the game.
 """
-from InvalidMoveException import MoveFromBothGridAndPileException, MoveFromNeitherGridNorPileException
+from InvalidMoveException import MoveFromBothGridAndPileException, MoveFromNeitherGridNorPileException, MoveToNonePositionException
 class Move:
     """
     Initializes a new Move object. 
@@ -15,6 +15,10 @@ class Move:
     def __init__(self, player_id, to_grid, from_grid=None, from_pile=None):
         self.player_id = player_id
         self.to_grid = to_grid
+
+        #check if there's a destination
+        if to_grid is None:
+            raise MoveToNonePositionException("Move destination cannot be None.")
 
         #check if move is from both pile or grid
         if from_grid != None and from_pile != None:

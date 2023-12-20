@@ -27,14 +27,14 @@ class Game:
         player2_name (str): The name of the second player.
       """
     def __init__(self, player1_name, player2_name) -> None:
-      self.player = [Player(player1_name, 0), Player(player2_name, 1)]
-      self.grid = [
-          [Pile(),Pile(),Pile(),Pile()],
-          [Pile(),Pile(),Pile(),Pile()],
-          [Pile(),Pile(),Pile(),Pile()],
-          [Pile(),Pile(),Pile(),Pile()]
-          ]
-      self.game_history = []
+        self.player = [Player(player1_name, 0), Player(player2_name, 1)]
+        self.grid = [
+            [Pile(),Pile(),Pile(),Pile()],
+            [Pile(),Pile(),Pile(),Pile()],
+            [Pile(),Pile(),Pile(),Pile()],
+            [Pile(),Pile(),Pile(),Pile()]
+            ]
+        self.move_history = []  # Changed from self.game_history = []
 
     """
       Prints the current state of the game board.
