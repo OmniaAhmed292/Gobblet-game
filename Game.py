@@ -13,219 +13,318 @@ from Postion import Postion
 
 
 class Game:
-  
-  player: list[Player]
-  grid: list[list[Pile]]
-  
-    
-  """
-    Initializes a new instance of the Game class.
-    Args:
-      player1_name (str): The name of the first player.
-      player2_name (str): The name of the second player.
-    """
-  def __init__(self, player1_name, player2_name) -> None:
-    self.player = [Player(player1_name, 0), Player(player2_name, 1)]
-    self.grid = [
-        [Pile(),Pile(),Pile(),Pile()],
-        [Pile(),Pile(),Pile(),Pile()],
-        [Pile(),Pile(),Pile(),Pile()],
-        [Pile(),Pile(),Pile(),Pile()]
+    player: list[Player]
+    grid: list[list[Pile]]
+    best_move: tuple[Postion, Postion, int]
+
+    def __init__(self, player1_name, player2_name) -> None:
+        self.player = [Player(player1_name, 0), Player(player2_name, 1)]
+        self.grid = [
+            [Pile(), Pile(), Pile(), Pile()],
+            [Pile(), Pile(), Pile(), Pile()],
+            [Pile(), Pile(), Pile(), Pile()],
+            [Pile(), Pile(), Pile(), Pile()]
         ]
+        self.best_move = None
 
-  """
-    Prints the current state of the game board.
-  """
-  def print_grid(self) -> None:
-    for row in self.grid:
-      for cell in row:
-        print(cell.rocks[-1].size if cell.rocks else '#', end=' ')
-      print("\n")
-    print("\n")
+    def print_grid(self) -> None:
+        for row in self.grid:
+            for cell in row:
+                print(cell.rocks[-1].size if cell.rocks else '#', end=' ')
+            print("\n")
+        print("\n")
 
-  """
-    Checks if the move is valid.
-    Args:
-        player_id (int): The ID of the player making the move.
-        to_grid (Postion): The position to which the move is being made.
-        from_grid (Postion, optional): The position from which the move is being made. Defaults to None.
-        from_pile (int, optional): The pile from which the move is being made. Defaults to None.
-  """
-  def is_valid(self, player_id, to_grid, from_grid=None, from_pile=None):
-      
+    def is_able_to_win(self, to_grid: Postion) -> bool:
+        cnt = 0
 
-      if from_grid and from_pile:
-          raise Exception("You can either play from the grid or your piles, not both.")
-      if not from_grid and not from_pile:
-          raise Exception("You should play from either the grid or your piles at least.")
+        # Check for a winning condition in the row
+        for i in range(4):
+            if self.grid[to_grid.x][i].rocks and self.grid[to_grid.x][i].rocks[-1].id == \
+                    self.grid[to_grid.x][to_grid.y].rocks[-1].id:
+                cnt += 1
 
-      if from_grid and self.grid[from_grid.x][from_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[
-          -1].id != player_id:
-          raise Exception("You cannot play from another player's rocks.")
+        if cnt == 3:
+            return True
 
-    
-      if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id != player_id: #if the space is occupied by another player's rock
-          
-          cnt = 0
+        # Reset counter for column check
+        cnt = 0
 
-          # Check for a winning condition in the row
-          for i in range(4):
-              if self.grid[to_grid.x][i].rocks and self.grid[to_grid.x][i].rocks[-1].id == self.grid[to_grid.x][to_grid.y].rocks[-1].id:
-                  cnt += 1
+        # Check for a winning condition in the column
+        for i in range(4):
+            if self.grid[i][to_grid.y].rocks and self.grid[i][to_grid.y].rocks[-1].id == \
+                    self.grid[to_grid.x][to_grid.y].rocks[-1].id:
+                cnt += 1
 
-          if cnt == 3:
-              return
+        if cnt == 3:
+            return True
 
-          # Reset counter for column check
-          cnt = 0
+        cnt = 0
+        diff = to_grid.y - to_grid.x
+        # if the differnce between x and y == 0 then its the middile diagonal and we check grid[i][i]
+        # if the differnce between x and y == 1 then its above the middile diagonal and we check grid[i][i+1]
+        # if the differnce between x and y == -1 then its below the middile diagonal and we check grid[i+1][i]
+        # using dx and dy to simplify
+        if diff == 0:
+            dx = 0
+            dy = 0
+        if diff == 1:
+            dx = 1
+            dy = 0
+        if diff == -1:
+            dx = 0
+            dy = 1
+        # if its not the middle diagonal we need to check only 3 cells
+        for i in range(4 - abs(diff)):
+            if self.grid[i + dx][i + dy].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id == \
+                    self.grid[i + dx][i + dy].rocks[-1].id:
+                cnt += 1
 
-          # Check for a winning condition in the column
-          for i in range(4):
-              if self.grid[i][to_grid.y].rocks and self.grid[i][to_grid.y].rocks[-1].id == self.grid[to_grid.x][to_grid.y].rocks[-1].id:
-                  cnt += 1
+        if cnt == 3:
+            return True
 
-          if cnt == 3:
-              return
+        cnt = 0
+        dist = to_grid.y + to_grid.x
+        # if the sum of x and y == 3 then its the middile anti-diagonal and we check grid[i][3-i]
+        # if the sum of x and y == 2 then its above the middile anti-diagonal and we check grid[i][2-i]
+        # if the sum of x and y == 4 then its below the middile anti-diagonal and we check grid[i+1][3-i]
+        # using dx and dy to simplify
+        if dist == 3:
+            dx = 0
+            dy = 3
+            diff = 0
+        if dist == 2:
+            dx = 0
+            dy = 2
+            diff = 1
+        if dist == 4:
+            dx = 1
+            dy = 3
+            diff = 1
+        # if its not the middle diagonal we need to check only 3 cells
+        for i in range(4 - abs(diff)):
+            if self.grid[i + dx][dy - i].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id == \
+                    self.grid[i + dx][dy - i].rocks[-1].id:
+                cnt += 1
 
-          # Check diagonal
-          if (
-                  (to_grid.x + 2 < 4 and to_grid.y + 2 < 4
-                   and self.grid[to_grid.x + 1][to_grid.y + 1].rocks
-                   and self.grid[to_grid.x + 2][to_grid.y + 2].rocks
-                   and self.grid[to_grid.x + 1][to_grid.y + 1].rocks[-1].id != player_id
-                   and self.grid[to_grid.x + 2][to_grid.y + 2].rocks[-1].id != player_id)
-                  or
-                  (to_grid.x - 2 >= 0 and to_grid.y - 2 >= 0
-                   and self.grid[to_grid.x - 1][to_grid.y - 1].rocks
-                   and self.grid[to_grid.x - 2][to_grid.y - 2].rocks
-                   and self.grid[to_grid.x - 1][to_grid.y - 1].rocks[-1].id != player_id
-                   and self.grid[to_grid.x - 2][to_grid.y - 2].rocks[-1].id != player_id)
-                  or
-                  (to_grid.x + 2 < 4 and to_grid.y - 2 >= 0
-                   and self.grid[to_grid.x + 1][to_grid.y - 1].rocks
-                   and self.grid[to_grid.x + 2][to_grid.y - 2].rocks
-                   and self.grid[to_grid.x + 1][to_grid.y - 1].rocks[-1].id != player_id
-                   and self.grid[to_grid.x + 2][to_grid.y - 2].rocks[-1].id != player_id)
-                  or
-                  (to_grid.x - 2 >= 0 and to_grid.y + 2 < 4
-                   and self.grid[to_grid.x - 1][to_grid.y + 1].rocks
-                   and self.grid[to_grid.x - 2][to_grid.y + 2].rocks
-                   and self.grid[to_grid.x - 1][to_grid.y + 1].rocks[-1].id != player_id
-                   and self.grid[to_grid.x - 2][to_grid.y + 2].rocks[-1].id != player_id)
-          ):
-              return
-          else:
-              raise Exception("You cannot play on another player's rock unless they have 3 in a row")
+        if cnt == 3:
+            return True
 
-  """
-    Checks if Valid then executes a move and updates the game state.
-    Args:
-        player_id (int): The ID of the player making the move.
-        to_grid (Postion): The position to which the move is being made.
-        from_grid (Postion, optional): The position from which the move is being made. Defaults to None.
-        from_pile (int, optional): The pile from which the move is being made. Defaults to None.
-  """
-  def do_turn(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
-    self.is_valid(player_id, to_grid, from_grid, from_pile)
-    if from_pile:
-      self.grid[to_grid.x][to_grid.y].push(self.player[player_id].piles[from_pile].pop())
-    elif from_grid:
-      self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
+    def is_valid(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
+        if from_grid != None and from_pile != None:
+            raise Exception("You can either play from the grid or your piles, not both.")
+        if from_grid == None and from_pile == None:
+            raise Exception("You should play from either the grid or your piles at least.")
 
-  """
-  Checks if the current state of the game if it is a win
-  Returns:
-      True if three repetitions are found, False otherwise.
-  """
-  def check_win(self):
-      cnt = 0
+        if from_grid and from_grid.x == to_grid.x and from_grid.y == to_grid.y:
+            raise Exception("You cannot play on the same cell.")
 
-     # Check for a winning condition horizontally
-      for i in range(4):
-          for j in range(4):
-              if self.grid[i][j].rocks and self.grid[0][j].rocks and self.grid[i][j].rocks[-1].id == self.grid[0][j].rocks[-1].id:
-                  cnt += 1
-              if cnt == 4:
-                  return self.grid[0][j].rocks[-1].id
-      cnt = 0
+        if from_grid and self.grid[from_grid.x][from_grid.y].rocks and self.grid[from_grid.x][from_grid.y].rocks[
+            -1].id != player_id:
+            raise Exception("You cannot play from another player's rocks.")
 
-        # Check for a winning condition vertically
-      for i in range(4):
+        if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[
+            -1].id != player_id and not self.is_able_to_win(to_grid):
+            raise Exception("You cannot play on another player's rock unless they have 3 in a row")
+
+    def do_turn(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
+        self.is_valid(player_id, to_grid, from_grid, from_pile)
+        if from_pile != None:
+            self.grid[to_grid.x][to_grid.y].push(self.player[player_id].piles[from_pile].pop())
+        elif from_grid != None:
+            self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
+
+    def undo_turn(self, player_id, from_grid: Postion, to_grid: Postion = None, to_pile: int = None) -> None:
+        if to_pile != None:
+            self.player[player_id].piles[to_pile].push(self.grid[from_grid.x][from_grid.y].pop())
+        elif to_grid != None:
+            self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
+
+    def check_win(self) -> tuple[bool, int]:  # return -1 if no one win yet
+        cnt = 0
+        for i in range(4):
             for j in range(4):
-                if self.grid[j][i].rocks and self.grid[0][j].rocks and self.grid[j][i].rocks[-1].id == self.grid[0][j].rocks[-1].id:
+                if self.grid[i][j].rocks and self.grid[0][j].rocks and self.grid[i][j].rocks[-1].id == \
+                        self.grid[0][j].rocks[-1].id:
                     cnt += 1
                 if cnt == 4:
-                    return self.grid[i][0].rocks[-1].id
-                  
-          # Check Diagonal
-      if all(self.grid[i][i].rocks and self.grid[i][i].rocks[-1].id == self.grid[0][0].rocks[-1].id for i in range(4)):
-          return self.grid[0][0].rocks[-1].id
+                    return True, self.grid[0][j].rocks[-1].id
+            cnt = 0
 
-          # Check anti-diagonal
-      if all(self.grid[i][3 - i].rocks and self.grid[i][3 - i].rocks[-1].id == self.grid[0][3].rocks[-1].id for i in range(4)):
-          return self.grid[0][3].rocks[-1].id
+        for i in range(4):
+            for j in range(4):
+                if self.grid[j][i].rocks and self.grid[j][0].rocks and self.grid[j][i].rocks[-1].id == \
+                        self.grid[j][0].rocks[-1].id:
+                    cnt += 1
+                if cnt == 4:
+                    return True, self.grid[j][0].rocks[-1].id
+            cnt = 0
 
-  def has_legalMoves(self):
-        """
-        Checks if any legal move is available for the current player.
+        if all(self.grid[i][i].rocks and self.grid[i][i].rocks[-1].id == self.grid[0][0].rocks[-1].id for i in
+               range(4)):
+            return True, self.grid[0][0].rocks[-1].id
 
-        Returns:
-            True if a legal move is available, False otherwise.
-        """
-        for to_grid_x in range(4):
-            for to_grid_y in range(4):
-                # Check if placing a new rock is legal
-                if not self.grid[to_grid_x][to_grid_y].rocks:
-                    # Check if placing a new rock is legal
-                    if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y)):
-                        return True
+            # Check anti-diagonal
+        if all(self.grid[i][3 - i].rocks and self.grid[i][3 - i].rocks[-1].id == self.grid[0][3].rocks[-1].id for i in
+               range(4)):
+            return True, self.grid[0][3].rocks[-1].id
+        return False, -1
 
-                for from_pile_index in range(3):
-                    if not self.player[self.current_player.player_id].piles[from_pile_index].is_empty():
-                        # Check if playing from a pile is legal
-                        if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y), from_pile=from_pile_index):
-                            return True
 
-                for from_grid_x in range(4):
-                    for from_grid_y in range(4):
-                        if self.grid[from_grid_x][from_grid_y].rocks and self.grid[from_grid_x][from_grid_y].rocks[-1].id == self.current_player.player_id:
-                            # Check if moving a rock from the grid is legal
-                            if self.is_valid(self.current_player.player_id, Postion(to_grid_x, to_grid_y), Postion(from_grid_x, from_grid_y)):
-                                return True
-        return False
+def possible_move(self, player_id: int) -> list[tuple[Postion, Postion, int]]:  # to_grid, from_grid, from_pile
+    successors_moves = []
+    available_sizes = set()
+    available_piles = []
+    idx = -1
+    for j in range(3):
+        if self.player[player_id].piles[j].rocks and (
+                not self.player[player_id].piles[j].rocks[-1].size in available_sizes):
+            available_sizes.add(self.player[player_id].piles[j].rocks[-1].size)
+            available_piles.append(j)
 
-  """
-    Checks if the current state of the game has three repetitions of identical moves.
-    Returns:
-        True if three repetitions are found, False otherwise.
-  """
-  def check_tie(self): 
-    #All spaces are filled and it's been three moves with no winner
-    if self.check_three_repetitions():
-        return True
-    #No more valid moves can be made
-    if not self.has_legalMoves():
-        if(self.check_win() == None):
-            return True
-        
+    for element in available_sizes:
+        idx += 1
+        for j in range(4):
+            for k in range(4):
+                yield Postion(j, k), None, available_piles[idx]
 
-    return False
+    for (i) in range(4):
+        for (j) in range(4):
+            if self.grid[i][j].rocks and self.grid[i][j].rocks[-1].id == player_id:
+                for k in range(4):
+                    for l in range(4):
+                        yield Postion(k, l), Postion(i, j), None
 
-#def possible_moves(self, player_id):
-''' def check_three_repetitions(self):
-    """
-    Checks if the current state of the game has three repetitions of identical moves.
+def best_move(game: Game, player_id: int, default_depth=3) -> tuple[Postion, Postion, int]:
+    best_score = -999
+    move = None
+    for to_grid, from_grid, from_pile in possible_move(game, player_id):
+        try:
+            game.do_turn(player_id, to_grid, from_grid, from_pile)
+            score = min_max(game, False, player_id, default_depth)
+            game.undo_turn(player_id, to_grid, from_grid, from_pile)
+            if score > best_score:
+                best_score = score
+                move = (to_grid, from_grid, from_pile)
+        except IndexError as e:
+            print(e.__traceback__)
+            raise e
+            continue
+        except Exception as e:
+            # print(e)
+            continue
+    return move
 
-    Returns:
-        True if three repetitions are found, False otherwise.
-    """
 
-    # Keep track of the game history
-    game_history = []
+def min_max(game: Game, is_max_player, player_id, depth=2) -> int:
+    is_game_ended, winner_id = game.check_win()
+    if is_game_ended:
+        return 1 if winner_id == player_id else -1
+    # TODO check for draw and return 0
+    if depth == 0:
+        evaluation = -999
+        for to_grid, from_grid, from_pile in possible_move(game, int(is_max_player)):
+            evaluation = max(evaluation, evaluation_function(game, int(is_max_player), to_grid, from_grid, from_pile))
+        return evaluation*(1 if is_max_player else -1)
+    if is_max_player:
+        ret = -999
+        for to_grid, from_grid, from_pile in possible_move(game, player_id):
+            try:
+                game.do_turn(player_id, to_grid, from_grid, from_pile)
+                ret = max(ret, min_max(game, False, player_id, depth - 1))
+                game.undo_turn(player_id, to_grid, from_grid, from_pile)
+            except IndexError as e:
+                print(e.__traceback__)
+                raise e
+                continue
+            except Exception as e:
+                # print(e)
+                continue
+    else:
+        ret = 999
+        for to_grid, from_grid, from_pile in possible_move(game, 1 - player_id):
+            try:
+                game.do_turn(1-player_id, to_grid, from_grid, from_pile)
+                ret = min(ret, min_max(game, True, player_id, depth - 1))
+                game.undo_turn(1-player_id, to_grid, from_grid, from_pile)
+            except IndexError as e:
+                print(e.__traceback__)
+                raise e
+                continue
+            except Exception as e:
+                continue
+    return ret
 
-    # Check for three consecutive identical entries in the history
-    for i in range(len(game_history) - 2):
-        if game_history[i] == game_history[i + 1] and game_history[i + 1] == game_history[i + 2]:
-            return True
+def evaluation_function(game:Game, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> int:
+    # check row
+    sum_row = 0
+    sum_col = 0
+    sum_diagonal = 0
+    sum_anti_diagonal = 0
+    row = to_grid.x
+    col = to_grid.y
+    for i in range(4):
+        if game.grid[row][i].rocks and game.grid[row][i].rocks[-1].id == player_id:
+            sum_row += 1
+        if game.grid[i][col].rocks and game.grid[i][col].rocks[-1].id == player_id:
+            sum_col += 1
 
-    return False'''
+    # check diagonal
+    if row == col:
+
+        for i in range(4):
+            if game.grid[i][i].rocks and game.grid[i][i].rocks[-1].id == player_id:
+                sum_diagonal += 1
+
+    # check anti-diagonal
+    if row + col == 3:
+
+        for i in range(4):
+            if game.grid[i][3 - i].rocks and game.grid[i][3 - i].rocks[-1].id == player_id:
+                sum_anti_diagonal += 1
+
+    tot_sum = sum_row + sum_col + sum_diagonal + sum_anti_diagonal
+    return tot_sum
+
+#     def __init__(self):
+#         self.board = [[None for _ in range(4)] for _ in range(4)]
+#         self.white_pieces = generate_pieces("white")
+#         self.black_pieces = generate_pieces("black")
+#         self.white_reserves = get_reserves(self.white_pieces)
+#         self.black_reserves = get_reserves(self.black_pieces)
+#         self.current_player = "white"
+#
+#     def execute_move(self, move):
+#         # Execute the move
+#         piece, start, end = move
+#
+#         # Remove piece from reserves if first move
+#         if start is None:
+#             self.remove_from_reserves(piece, self.current_player)
+#
+#         # Move piece on the board
+#         self.move_piece(start, end)
+#
+#         # Switch players
+#         if self.current_player == "white":
+#             self.current_player = "black"
+#         else:
+#             self.current_player = "white"
+#
+#     def validate_move(self, move):
+#         # Validate move based on rules
+#         # Return True if valid, False if invalid
+#
+
+#     def get_possible_moves(self):
+#         # Return list of legal moves for current player
+#
+# # Helper functions
+#
+#     def remove_from_reserves(self, piece, player):
+#         # Remove piece from player reserves
+#
+#     def move_piece(self, start, end):
+#         # Handle move of piece start -> end
+#
+#     def get_reserves(self, pieces):
+#         # Get remaining reserve p
