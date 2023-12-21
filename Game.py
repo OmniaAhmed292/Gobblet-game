@@ -7,6 +7,8 @@ Game class should be responsible for:
 * Checking win conditions
 * Providing available moves for current player
 '''
+import math
+
 from Pile import Pile
 from Player import Player
 from Postion import Postion
@@ -60,9 +62,9 @@ class Game:
 
         cnt = 0
         diff = to_grid.y - to_grid.x
-        # if the differnce between x and y == 0 then its the middile diagonal and we check grid[i][i]
-        # if the differnce between x and y == 1 then its above the middile diagonal and we check grid[i][i+1]
-        # if the differnce between x and y == -1 then its below the middile diagonal and we check grid[i+1][i]
+        # if the differnce between x and y == 0 then its the middle diagonal and we check grid[i][i]
+        # if the differnce between x and y == 1 then its above the middle diagonal and we check grid[i][i+1]
+        # if the differnce between x and y == -1 then its below the middle diagonal and we check grid[i+1][i]
         # using dx and dy to simplify
         if diff == 0:
             dx = 0
@@ -74,13 +76,14 @@ class Game:
             dx = 0
             dy = 1
         # if its not the middle diagonal we need to check only 3 cells
-        for i in range(4 - abs(diff)):
-            if self.grid[i + dx][i + dy].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id == \
-                    self.grid[i + dx][i + dy].rocks[-1].id:
-                cnt += 1
+        if(diff==0 or diff==1 or diff==-1):
+            for i in range(4 - abs(diff)):
+                if self.grid[i + dx][i + dy].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id == \
+                        self.grid[i + dx][i + dy].rocks[-1].id:
+                    cnt += 1
 
-        if cnt == 3:
-            return True
+            if cnt == 3:
+                return True
 
         cnt = 0
         dist = to_grid.y + to_grid.x
@@ -109,23 +112,43 @@ class Game:
         if cnt == 3:
             return True
 
-    def is_valid(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
+    def is_valid(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> bool:
         if from_grid != None and from_pile != None:
-            raise Exception("You can either play from the grid or your piles, not both.")
+            return False
+            # raise Exception("You can either play from the grid or your piles, not both.")
         if from_grid == None and from_pile == None:
-            raise Exception("You should play from either the grid or your piles at least.")
+            return False
+            # raise Exception("You should play from either the grid or your piles at least.")
 
         if from_grid and from_grid.x == to_grid.x and from_grid.y == to_grid.y:
-            raise Exception("You cannot play on the same cell.")
+            return False
+            # raise Exception("You cannot play on the same cell.")
 
         if from_grid and self.grid[from_grid.x][from_grid.y].rocks and self.grid[from_grid.x][from_grid.y].rocks[
             -1].id != player_id:
-            raise Exception("You cannot play from another player's rocks.")
+            return False
+            # raise Exception("You cannot play from another player's rocks.")
+
+        if from_grid and not self.grid[from_grid.x][from_grid.y].rocks:
+            return False
+            # raise Exception("You cannot play from an empty cell.")
+
+        if from_grid and self.grid[to_grid.x][to_grid.y].rocks and self.grid[from_grid.x][from_grid.y].rocks[-1].size <= self.grid[to_grid.x][to_grid.y].rocks[-1].size:
+            return False
+            # raise Exception("You cannot play from a smaller rock to a larger one.")
+
+        if from_pile!= None and self.grid[to_grid.x][to_grid.y].rocks and self.player[player_id].piles[from_pile].rocks and self.player[player_id].piles[from_pile].rocks[-1].size <= self.grid[to_grid.x][to_grid.y].rocks[-1].size:
+            return False
+            # raise Exception("You cannot play from a smaller rock to a larger one.")
+        if from_pile!=None and not self.player[player_id].piles[from_pile].rocks:
+            return False
+            #raise Exception("can not remove from empty space")
 
         if self.grid[to_grid.x][to_grid.y].rocks and self.grid[to_grid.x][to_grid.y].rocks[
             -1].id != player_id and not self.is_able_to_win(to_grid):
-            raise Exception("You cannot play on another player's rock unless they have 3 in a row")
-
+            return False
+            # raise Exception("You cannot play on another player's rock unless they have 3 in a row")
+        return True
     def do_turn(self, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> None:
         self.is_valid(player_id, to_grid, from_grid, from_pile)
         if from_pile != None:
@@ -185,37 +208,35 @@ def possible_move(self, player_id: int) -> list[tuple[Postion, Postion, int]]:  
         idx += 1
         for j in range(4):
             for k in range(4):
-                yield Postion(j, k), None, available_piles[idx]
+                if(self.is_valid(player_id, Postion(j, k), None, available_piles[idx])):
+                    yield Postion(j, k), None, available_piles[idx]
+
 
     for (i) in range(4):
         for (j) in range(4):
             if self.grid[i][j].rocks and self.grid[i][j].rocks[-1].id == player_id:
                 for k in range(4):
                     for l in range(4):
-                        yield Postion(k, l), Postion(i, j), None
+                       if(self.is_valid(player_id, Postion(k, l), Postion(i, j), None)):
+                           yield  Postion(k, l), Postion(i, j), None
 
-def best_move(game: Game, player_id: int, default_depth=3) -> tuple[Postion, Postion, int]:
+    return successors_moves
+def best_move(game: Game, player_id: int, default_depth=1) -> tuple[Postion, Postion, int]:
     best_score = -999
     move = None
     for to_grid, from_grid, from_pile in possible_move(game, player_id):
-        try:
             game.do_turn(player_id, to_grid, from_grid, from_pile)
             score = min_max(game, False, player_id, default_depth)
             game.undo_turn(player_id, to_grid, from_grid, from_pile)
             if score > best_score:
                 best_score = score
                 move = (to_grid, from_grid, from_pile)
-        except IndexError as e:
-            print(e.__traceback__)
-            raise e
-            continue
-        except Exception as e:
-            # print(e)
-            continue
+
+
     return move
 
 
-def min_max(game: Game, is_max_player, player_id, depth=2) -> int:
+def min_max(game: Game, is_max_player, player_id, depth=1) -> int:
     is_game_ended, winner_id = game.check_win()
     if is_game_ended:
         return 1 if winner_id == player_id else -1
@@ -228,62 +249,172 @@ def min_max(game: Game, is_max_player, player_id, depth=2) -> int:
     if is_max_player:
         ret = -999
         for to_grid, from_grid, from_pile in possible_move(game, player_id):
-            try:
-                game.do_turn(player_id, to_grid, from_grid, from_pile)
-                ret = max(ret, min_max(game, False, player_id, depth - 1))
-                game.undo_turn(player_id, to_grid, from_grid, from_pile)
-            except IndexError as e:
-                print(e.__traceback__)
-                raise e
-                continue
-            except Exception as e:
-                # print(e)
-                continue
+            game.do_turn(player_id, to_grid, from_grid, from_pile)
+            ret = max(ret, min_max(game, False, player_id, depth - 1))
+            game.undo_turn(player_id, to_grid, from_grid, from_pile)
+
+
     else:
         ret = 999
         for to_grid, from_grid, from_pile in possible_move(game, 1 - player_id):
-            try:
                 game.do_turn(1-player_id, to_grid, from_grid, from_pile)
                 ret = min(ret, min_max(game, True, player_id, depth - 1))
                 game.undo_turn(1-player_id, to_grid, from_grid, from_pile)
-            except IndexError as e:
-                print(e.__traceback__)
-                raise e
-                continue
-            except Exception as e:
-                continue
+
+
     return ret
 
-def evaluation_function(game:Game, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> int:
-    # check row
-    sum_row = 0
-    sum_col = 0
-    sum_diagonal = 0
-    sum_anti_diagonal = 0
+def evaluation_function(game: Game, player_id, to_grid: Postion, from_grid: Postion = None, from_pile: int = None) -> int:
     row = to_grid.x
     col = to_grid.y
+    sum_row = 0
+    sum_col = 0
+    sum_diag = 0
+    sum_anti_diag = 0
+    sum=0
+    # Handling Positive effect on Row states
     for i in range(4):
-        if game.grid[row][i].rocks and game.grid[row][i].rocks[-1].id == player_id:
-            sum_row += 1
-        if game.grid[i][col].rocks and game.grid[i][col].rocks[-1].id == player_id:
+        gobblet_count = 0
+        empty_count = 0
+        for cell in game.grid[i]:
+            if cell.rocks and cell.rocks[-1].id == player_id:
+                gobblet_count += 1
+            elif not cell.rocks:
+                empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum += 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_row += 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_row += 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_row += math.inf
+
+    # Handling Negative effect on Row states
+    for i in range(4):
+        gobblet_count = 0
+        empty_count = 0
+        for cell in game.grid[i]:
+            if cell.rocks and cell.rocks[-1].id is not player_id:
+                gobblet_count += 1
+            elif not cell.rocks:
+                empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum -= 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_row -= 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_row -= 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_row -= math.inf
+
+    for i in range(4):
+        gobblet_count = 0
+        empty_count = 0
+        for cell in game.grid[i]:
+            if cell.rocks and cell.rocks[-1].id == player_id:
+                gobblet_count += 1
+            elif not cell.rocks:
+                empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
             sum_col += 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_col += 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_col += 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_col += math.inf
 
-    # check diagonal
-    if row == col:
+    for i in range(4):
+        gobblet_count = 0
+        empty_count = 0
+        for cell in game.grid[i]:
+            if cell.rocks and cell.rocks[-1].id is not player_id:
+                gobblet_count += 1
+            elif not cell.rocks:
+                empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum_col -= 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_col -= 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_col -= 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_col -= math.inf
 
-        for i in range(4):
-            if game.grid[i][i].rocks and game.grid[i][i].rocks[-1].id == player_id:
-                sum_diagonal += 1
+    # Handling Diagonal states
+    for i in range(len(game.grid)):
+        gobblet_count = 0
+        empty_count = 0
+        cell = game.grid[i][i]
+        if cell.rocks and cell.rocks[-1].id == player_id:
+            gobblet_count += 1
+        elif not cell.rocks:
+            empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum_diag += 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_diag += 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_diag += 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_diag += math.inf
 
-    # check anti-diagonal
-    if row + col == 3:
+    for i in range(len(game.grid)):
+        gobblet_count = 0
+        empty_count = 0
+        cell = game.grid[i][i]
+        if cell.rocks and cell.rocks[-1].id is not player_id:
+            gobblet_count += 1
+        elif not cell.rocks:
+            empty_count -= 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum_diag -= 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_diag -= 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_diag -= 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_diag -= math.inf
 
-        for i in range(4):
-            if game.grid[i][3 - i].rocks and game.grid[i][3 - i].rocks[-1].id == player_id:
-                sum_anti_diagonal += 1
+    # Handling anti Diagonal states
+    for i in range(len(game.grid)):
+        gobblet_count = 0
+        empty_count = 0
+        cell = game.grid[i][len(game.grid) - 1 - i]
+        if cell.rocks and cell.rocks[-1].id == player_id:
+            gobblet_count += 1
+        elif not cell.rocks:
+            empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum_anti_diag += 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_anti_diag += 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_anti_diag += 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_anti_diag += 999
 
-    tot_sum = sum_row + sum_col + sum_diagonal + sum_anti_diagonal
-    return tot_sum
+    for i in range(len(game.grid)):
+        gobblet_count = 0
+        empty_count = 0
+        cell = game.grid[i][len(game.grid) - 1 - i]
+        if cell.rocks and cell.rocks[-1].id is not player_id:
+            gobblet_count += 1
+        elif not cell.rocks:
+            empty_count += 1
+        if gobblet_count == 1 and empty_count == 3:
+            sum_anti_diag -= 1
+        elif gobblet_count == 2 and empty_count == 2:
+            sum_anti_diag -= 10
+        elif gobblet_count == 3 and empty_count == 1:
+            sum_anti_diag -= 100
+        elif gobblet_count == 4 and empty_count == 0:
+            sum_anti_diag -= 999
+
+    total_weight = sum_row + sum_col + sum_diag + sum_anti_diag
+
+    return total_weight
 
 #     def __init__(self):
 #         self.board = [[None for _ in range(4)] for _ in range(4)]
