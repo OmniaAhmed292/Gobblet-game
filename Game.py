@@ -22,10 +22,10 @@ class Game:
     def __init__(self, player1_name, player2_name) -> None:
         self.player = [Player(player1_name, 0), Player(player2_name, 1)]
         self.grid = [
-            [Pile(), Pile(), Pile(), Pile()],
-            [Pile(), Pile(), Pile(), Pile()],
-            [Pile(), Pile(), Pile(), Pile()],
-            [Pile(), Pile(), Pile(), Pile()]
+            [Pile(-1), Pile(-1), Pile(-1), Pile(-1)],
+            [Pile(-1), Pile(-1), Pile(-1), Pile(-1)],
+            [Pile(-1), Pile(-1), Pile(-1), Pile(-1)],
+            [Pile(-1), Pile(-1), Pile(-1), Pile(-1)]
         ]
         self.best_move = None
 
@@ -153,6 +153,7 @@ class Game:
         self.is_valid(player_id, to_grid, from_grid, from_pile)
         if from_pile != None:
             self.grid[to_grid.x][to_grid.y].push(self.player[player_id].piles[from_pile].pop())
+            # self.grid[to_grid.x][to_grid.y].rocks[-1].pile_no = from_pile
         elif from_grid != None:
             self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
 
@@ -194,7 +195,7 @@ class Game:
 
 
 def possible_move(self, player_id: int) -> list[tuple[Postion, Postion, int]]:  # to_grid, from_grid, from_pile
-    successors_moves = []
+
     available_sizes = set()
     available_piles = []
     idx = -1
@@ -220,8 +221,11 @@ def possible_move(self, player_id: int) -> list[tuple[Postion, Postion, int]]:  
                        if(self.is_valid(player_id, Postion(k, l), Postion(i, j), None)):
                            yield  Postion(k, l), Postion(i, j), None
 
-    return successors_moves
-def best_move(game: Game, player_id: int, default_depth=1) -> tuple[Postion, Postion, int]:
+
+def best_move(game: Game, player_id: int, default_depth=1) -> tuple[Postion, Postion, int,int, int]:
+    sz=0
+    p_no=0
+    f,t=0,0
     best_score = -999
     move = None
     for to_grid, from_grid, from_pile in possible_move(game, player_id):
@@ -230,13 +234,26 @@ def best_move(game: Game, player_id: int, default_depth=1) -> tuple[Postion, Pos
             game.undo_turn(player_id, to_grid, from_grid, from_pile)
             if score > best_score:
                 best_score = score
-                move = (to_grid, from_grid, from_pile)
+                # move = (to_grid, from_grid, from_pile)
+
+                if from_pile!=None:
+                    sz=game.player[player_id].piles[from_pile].rocks[-1].size
+                    p_no=from_pile
+                    t=to_grid
+                elif from_grid!=None:
+                    sz=game.grid[from_grid.x][from_grid.y].rocks[-1].size
+                    p_no=game.grid[from_grid.x][from_grid.y].rocks[-1].pile_no
+                    f=from_grid
+
+                move = (to_grid,from_grid,from_pile,p_no,sz)
+
 
 
     return move
 
 
-def min_max(game: Game, is_max_player, player_id, depth=1) -> int:
+
+def min_max(game: Game, is_max_player, player_id, depth=10) -> int:
     is_game_ended, winner_id = game.check_win()
     if is_game_ended:
         return 1 if winner_id == player_id else -1
