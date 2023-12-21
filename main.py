@@ -3,6 +3,7 @@ import sys
 import os
 import math
 from Game import Game
+from Game import best_move
 from Postion import Postion
 
 
@@ -694,8 +695,8 @@ def Game_Handler(mode):
         pygame.display.flip()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
-        global game1
-        game1 = Game("Hanan", "omnia")
+        #global game1
+        #game1 = Game("Hanan", "omnia")
         pygame.display.flip()
         
     elif mode == "Computer_vs_Computer":
@@ -704,11 +705,32 @@ def Game_Handler(mode):
         Draw_White_Gobblets()
         pygame.display.flip()
 
+        global game1
+        game1 = Game("Hanan", "omnia")
+
         pygame.display.set_caption("Game Started")
         #Handle the Game based on the difficulty of each AI
         if ai_1_difficulty == "hard" and ai_2_difficulty == "hard":
             #call the algorithm that handle this case
             print("hard vs hard")
+
+            end = False
+            while not end:
+                end, winner = game1.check_win()
+                to, frm, pile,pn,sz = best_move(game1, 0)
+                game1.do_turn(0, to,frm,pile)
+                move_gobblet(Black_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
+                game1.print_grid()
+
+            #move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
+
+                to, frm, pile,pn,sz = best_move(game1, 1)
+                game1.do_turn(1, to,frm,pile)
+                move_gobblet(White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
+                game1.print_grid()
+
+                print(end, winner)
+
         elif ai_1_difficulty == "easy" and ai_2_difficulty == "easy":
             #call the algorithm that handle this case
             print("easy vs easy")
@@ -760,6 +782,8 @@ if __name__ == "__main__":
     initialize_fonts()
     initialize_buttons()
     Events_Handler()
+
+    global game1
 
     game1 = Game("Hanan", "omnia")
     game1.print_grid()
