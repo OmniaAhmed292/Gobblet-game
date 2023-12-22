@@ -3,7 +3,7 @@ import sys
 import os
 import math
 from Game import Game
-from Game import best_move
+from min_max import best_move
 from Postion import Postion
 
 
@@ -30,7 +30,7 @@ def load_images():
     current_directory = os.path.dirname(__file__)
     # Define the relative path to the 'Images' folder
     image_directory = os.path.join(current_directory, 'Images')
-    background_filename = "background.png"
+    background_filename = "Background.png"
     back_arrow_filename = "back_arrow.png"
     black_gobblet_filename = "black_gobblet.png"
     white_gobblet_filename = "white_gobblet.png"
@@ -695,8 +695,8 @@ def Game_Handler(mode):
         pygame.display.flip()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
-        #global game1
-        #game1 = Game("Hanan", "omnia")
+        global game1
+        game1 = Game("Hanan", "omnia")
         pygame.display.flip()
         
     elif mode == "Computer_vs_Computer":
@@ -705,8 +705,8 @@ def Game_Handler(mode):
         Draw_White_Gobblets()
         pygame.display.flip()
 
-        global game1
-        game1 = Game("Hanan", "omnia")
+        #global game1
+        #game1 = Game("Hanan", "omnia")
 
         pygame.display.set_caption("Game Started")
         #Handle the Game based on the difficulty of each AI
