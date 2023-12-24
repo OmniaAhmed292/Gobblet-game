@@ -527,13 +527,13 @@ def Move_Human_Goblet():
                     global game1
 
                     if(turn == "P1"):
-                        game1.do_turn(0, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no + 1)
+                        game1.do_turn(0, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
 
                     elif(turn == "P2"):
-                        game1.do_turn(1, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no + 1)
+                        game1.do_turn(1, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
