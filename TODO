@@ -1,0 +1,5 @@
+1- added check_tie and check_win (before tie) function before doing turn
+2- mutual agreement withdrawal - tie
+3- finish all Game class tests; remaining methods: check tie, check has three repititions
+4- check is able to win error appearing in tests
+5- fix game class to alternate player's turns automatically and recieve starting player on initialization

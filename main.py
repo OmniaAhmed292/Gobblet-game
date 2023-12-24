@@ -3,8 +3,9 @@ import sys
 import os
 import math
 from Game import Game
+
+from Position import Position
 from Game import best_move
-from Postion import Postion
 
 
 # Initialize Pygame
@@ -21,6 +22,7 @@ def initialize_pygame():
     turn = "P1"
     
     global ai_1_difficulty, ai_2_difficulty
+
 
 
 # Load Images
@@ -527,13 +529,13 @@ def Move_Human_Goblet():
                     global game1
 
                     if(turn == "P1"):
-                        game1.do_turn(0, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
+                        game1.do_turn(0, Position(do_turn_to[1], do_turn_to[0]), Position(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
 
                     elif(turn == "P2"):
-                        game1.do_turn(1, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
+                        game1.do_turn(1, Position(do_turn_to[1], do_turn_to[0]), Position(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
