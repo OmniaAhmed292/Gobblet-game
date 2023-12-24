@@ -5,6 +5,7 @@ from Move import Move
 from InvalidMoveException import *
 
 class Game:
+
     """
     The Game class represents a game of Gobblet Gobblers. and is resoponsible for
     * Maintaining state of pieces on board and in reserves
@@ -34,6 +35,8 @@ class Game:
     grid: list[list[Pile]]
     move_history: list[Move]
     possible_moves: list[Move]
+    best_move: tuple[Postion, Postion, int]
+
     
 
     
@@ -64,7 +67,83 @@ class Game:
           print(cell.rocks[-1].size if cell.rocks else '#', end=' ')
         print("\n")
       print("\n")
+  
+    def is_able_to_win(self, to_grid: Postion) -> bool:
+        cnt = 0
 
+        # Check for a winning condition in the row
+        for i in range(4):
+            if self.grid[to_grid.x][i].rocks and self.grid[to_grid.x][i].rocks[-1].id == \
+                    self.grid[to_grid.x][to_grid.y].rocks[-1].id:
+                cnt += 1
+
+        if cnt == 3:
+            return True
+
+        # Reset counter for column check
+        cnt = 0
+
+        # Check for a winning condition in the column
+        for i in range(4):
+            if self.grid[i][to_grid.y].rocks and self.grid[i][to_grid.y].rocks[-1].id == \
+                    self.grid[to_grid.x][to_grid.y].rocks[-1].id:
+                cnt += 1
+
+        if cnt == 3:
+            return True
+
+        cnt = 0
+        diff = to_grid.y - to_grid.x
+        # if the differnce between x and y == 0 then its the middle diagonal and we check grid[i][i]
+        # if the differnce between x and y == 1 then its above the middle diagonal and we check grid[i][i+1]
+        # if the differnce between x and y == -1 then its below the middle diagonal and we check grid[i+1][i]
+        # using dx and dy to simplify
+        if diff == 0:
+            dx = 0
+            dy = 0
+        if diff == 1:
+            dx = 1
+            dy = 0
+        if diff == -1:
+            dx = 0
+            dy = 1
+        # if its not the middle diagonal we need to check only 3 cells
+        if(diff==0 or diff==1 or diff==-1):
+            for i in range(4 - abs(diff)):
+                if self.grid[i + dx][i + dy].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id == \
+                        self.grid[i + dx][i + dy].rocks[-1].id:
+                    cnt += 1
+
+            if cnt == 3:
+                return True
+
+        cnt = 0
+        dist = to_grid.y + to_grid.x
+        # if the sum of x and y == 3 then its the middile anti-diagonal and we check grid[i][3-i]
+        # if the sum of x and y == 2 then its above the middile anti-diagonal and we check grid[i][2-i]
+        # if the sum of x and y == 4 then its below the middile anti-diagonal and we check grid[i+1][3-i]
+        # using dx and dy to simplify
+        if dist == 3:
+            dx = 0
+            dy = 3
+            diff = 0
+        if dist == 2:
+            dx = 0
+            dy = 2
+            diff = 1
+        if dist == 4:
+            dx = 1
+            dy = 3
+            diff = 1
+        # if its not the middle diagonal we need to check only 3 cells
+        for i in range(4 - abs(diff)):
+            if self.grid[i + dx][dy - i].rocks and self.grid[to_grid.x][to_grid.y].rocks[-1].id == \
+                    self.grid[i + dx][dy - i].rocks[-1].id:
+                cnt += 1
+
+        if cnt == 3:
+            return True
+        return False
     
     def is_valid(self, move: Move) -> bool:
         """
@@ -112,36 +191,42 @@ class Game:
         
         # Reset the possible moves list after a move has been made
         self.possible_moves = None
-
-    def check_win(self):
+    
+    def check_win(self) -> tuple[bool, int]:  
         """
         Checks if the current state of the game if it is a win
         Returns:
-            The ID of the player who won the game if there is a winner, None otherwise
+            The ID of the player who won the game if there is a winner, -1 if there's no winner
         """
         cnt = 0
         for i in range(4):
             for j in range(4):
-                if self.grid[i][j].rocks and self.grid[0][j].rocks and self.grid[i][j].rocks[-1].id == self.grid[0][j].rocks[-1].id:
+                if self.grid[i][j].rocks and self.grid[0][j].rocks and self.grid[i][j].rocks[-1].id == \
+                        self.grid[0][j].rocks[-1].id:
                     cnt += 1
                 if cnt == 4:
-                    return self.grid[0][j].rocks[-1].id
-        cnt = 0
+                    return True, self.grid[0][j].rocks[-1].id
+            cnt = 0
+
         for i in range(4):
-              for j in range(4):
-                  if self.grid[j][i].rocks and self.grid[0][j].rocks and self.grid[j][i].rocks[-1].id == self.grid[0][j].rocks[-1].id:
-                      cnt += 1
-                  if cnt == 4:
-                      return self.grid[i][0].rocks[-1].id
+            for j in range(4):
+                if self.grid[j][i].rocks and self.grid[j][0].rocks and self.grid[j][i].rocks[-1].id == \
+                        self.grid[j][0].rocks[-1].id:
+                    cnt += 1
+                if cnt == 4:
+                    return True, self.grid[j][0].rocks[-1].id
+            cnt = 0
 
-        if all(self.grid[i][i].rocks and self.grid[i][i].rocks[-1].id == self.grid[0][0].rocks[-1].id for i in range(4)):
-            return self.grid[0][0].rocks[-1].id
+        if all(self.grid[i][i].rocks and self.grid[i][i].rocks[-1].id == self.grid[0][0].rocks[-1].id for i in
+               range(4)):
+            return True, self.grid[0][0].rocks[-1].id
 
-        # Check anti-diagonal
-        if all(self.grid[i][3 - i].rocks and self.grid[i][3 - i].rocks[-1].id == self.grid[0][3].rocks[-1].id for i in range(4)):
-            return self.grid[0][3].rocks[-1].id
-
-
+            # Check anti-diagonal
+        if all(self.grid[i][3 - i].rocks and self.grid[i][3 - i].rocks[-1].id == self.grid[0][3].rocks[-1].id for i in
+               range(4)):
+            return True, self.grid[0][3].rocks[-1].id
+        return False, -1
+    
     def has_legalMoves(self, player_id):
         """
         Checks if any legal move is available for the current player.
@@ -180,28 +265,6 @@ class Game:
         """
         #it's been three cycling moves with no winner or there are no legal moves left
         if self.check_three_repetitions() or (not self.has_legalMoves()):
-            return True
-        return False
-
-    def generate_possible_moves(self, player_id) -> list[Move]:
-        """
-        Generates a list of all possible moves for the given player.
-        Args:
-            player_id (int): The ID of the player to generate moves for.
-        Returns:
-            A list of all possible moves for the given player.
-        """
-        # Check if the list of possible moves has already been generated
-        if self.possible_moves:
-            return self.possible_moves
-        
-        # Initialize possible_moves as an empty list
-        self.possible_moves = []
-
-        #check all combinations of moves to grid
-        for to_grid_x in range(4):
-            for to_grid_y in range(4):
-
                 #check all combinations of moves from piles
                 for from_pile_index in range(3):
                     # Check if playing from a pile is legal
@@ -225,3 +288,56 @@ class Game:
                         
                             
         return self.possible_moves
+
+    def undo_turn(self, player_id, from_grid: Postion, to_grid: Postion = None, to_pile: int = None) -> None:
+        if to_pile != None:
+            self.player[player_id].piles[to_pile].push(self.grid[from_grid.x][from_grid.y].pop())
+        elif to_grid != None:
+            self.grid[to_grid.x][to_grid.y].push(self.grid[from_grid.x][from_grid.y].pop())
+
+
+
+
+#     def __init__(self):
+#         self.board = [[None for _ in range(4)] for _ in range(4)]
+#         self.white_pieces = generate_pieces("white")
+#         self.black_pieces = generate_pieces("black")
+#         self.white_reserves = get_reserves(self.white_pieces)
+#         self.black_reserves = get_reserves(self.black_pieces)
+#         self.current_player = "white"
+#
+#     def execute_move(self, move):
+#         # Execute the move
+#         piece, start, end = move
+#
+#         # Remove piece from reserves if first move
+#         if start is None:
+#             self.remove_from_reserves(piece, self.current_player)
+#
+#         # Move piece on the board
+#         self.move_piece(start, end)
+#
+#         # Switch players
+#         if self.current_player == "white":
+#             self.current_player = "black"
+#         else:
+#             self.current_player = "white"
+#
+#     def validate_move(self, move):
+#         # Validate move based on rules
+#         # Return True if valid, False if invalid
+#
+
+#     def get_possible_moves(self):
+#         # Return list of legal moves for current player
+#
+# # Helper functions
+#
+#     def remove_from_reserves(self, piece, player):
+#         # Remove piece from player reserves
+#
+#     def move_piece(self, start, end):
+#         # Handle move of piece start -> end
+#
+#     def get_reserves(self, pieces):
+#         # Get remaining reserve p

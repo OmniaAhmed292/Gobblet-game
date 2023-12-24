@@ -14,7 +14,7 @@ class Rock:
   size: int  # 1 = small, 2 = medium, 3 = large
   id: int  # refers to the player who owns this rock
 
-  def __init__(self, size: int, id: int) -> None:
+  def __init__(self, size: int, id: int, pile_no: int) -> None:
     """
     Initializes a new Rock object.
 
@@ -26,3 +26,4 @@ class Rock:
       raise Exception("Invalid rock size")
     self.size = size
     self.id = id
+    self.pile_no = pile_no
