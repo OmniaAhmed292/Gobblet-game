@@ -3,7 +3,7 @@ import sys
 import os
 import math
 from Game import Game
-from min_max import best_move
+from Game import best_move
 from Postion import Postion
 
 
@@ -30,7 +30,7 @@ def load_images():
     current_directory = os.path.dirname(__file__)
     # Define the relative path to the 'Images' folder
     image_directory = os.path.join(current_directory, 'Images')
-    background_filename = "Background.png"
+    background_filename = "background.png"
     back_arrow_filename = "back_arrow.png"
     black_gobblet_filename = "black_gobblet.png"
     white_gobblet_filename = "white_gobblet.png"
@@ -425,15 +425,37 @@ def move_gobblet(Gobblet_rect, grid_centers_tuple):
 
 def Move_Human_Goblet():
 
-    global selected_image, turn
+    global selected_image, turn, game1
     clicked = False
 
     # First click: select the image
     mouse_pos = pygame.mouse.get_pos()
     
-    global pile_no, game1
+
+    do_turn_from = (None, None)
+    do_turn_to = (None, None)
+
+    do_turn_from = list(do_turn_from)
+    do_turn_to = list(do_turn_to)
 
   
+    i = None
+    j = None
+
+    for x in range (4):
+
+        if(mouse_pos[0] < 200 or mouse_pos[0] > 600 or mouse_pos[1] < 100 or mouse_pos[1] > 500):
+            do_turn_from[0] = None
+            do_turn_from[1] = None
+            pass
+
+        if(mouse_pos[0] > (200 + x * 100) and mouse_pos[0] < (200 + (x + 1) * 100)):
+            i = x
+            do_turn_from[0] = x
+
+        if(mouse_pos[1] > (100 + x * 100) and mouse_pos[1] < (100 + (x + 1) * 100)):
+            j = x
+            do_turn_from[1] = x
     
     for x in range (4):
         for y in range (3):
@@ -443,13 +465,13 @@ def Move_Human_Goblet():
                 if(turn == "P1"):
                     if (Black_Gobblets_rect[3- x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
-                        pile_no = (2 - y)
+                        do_turn_pile_no = (2 - y)
                         clicked = True
 
                 elif(turn == "P2"):
                     if (White_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = White_Gobblets_rect[3 - x][2- y]
-                        pile_no = (2 - y)
+                        do_turn_pile_no = (2 - y)
                         clicked = True
 
             elif(mode_selection == "hard_ai_vs_human"):
@@ -457,6 +479,7 @@ def Move_Human_Goblet():
                 if(turn == "P1"):
                     if (Black_Gobblets_rect[3- x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
+                        do_turn_pile_no = (2 - y)
                         clicked = True
 
                 elif(turn == "P2"):
@@ -467,6 +490,7 @@ def Move_Human_Goblet():
                 if(turn == "P1"):
                     if (Black_Gobblets_rect[3- x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
+                        do_turn_pile_no = (2 - y)
                         clicked = True
 
                 elif(turn == "P2"):
@@ -482,30 +506,34 @@ def Move_Human_Goblet():
                 # Second click: move the image
                 mouse_pos = pygame.mouse.get_pos()
                 #minimum = math.sqrt(Table_centers[0][0][0] ** 2 + Table_centers[0][0][1] ** 2)
-                i = 0
-                j = 0
+                i = None
+                j = None
 
                 for x in range (4):
 
                     if(mouse_pos[0] > (200 + x * 100) and mouse_pos[0] < (200 + (x + 1) * 100)):
                         i = x
+                        do_turn_to[0] = x
 
                     if(mouse_pos[1] > (100 + x * 100) and mouse_pos[1] < (100 + (x + 1) * 100)):
                         j = x
+                        do_turn_to[1] = x
 
 
 
                 if selected_image:
                     move_gobblet(selected_image, Table_centers[i][j])
 
+                    global game1
+
                     if(turn == "P1"):
-                        game1.do_turn(0, Postion(j, i), from_pile=pile_no)
+                        game1.do_turn(0, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no + 1)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
 
                     elif(turn == "P2"):
-                        game1.do_turn(1, Postion(j, i), from_pile=pile_no)
+                        game1.do_turn(1, Postion(do_turn_to[1], do_turn_to[0]), Postion(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no + 1)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
@@ -695,8 +723,8 @@ def Game_Handler(mode):
         pygame.display.flip()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
-        global game1
-        game1 = Game("Hanan", "omnia")
+        #global game1
+        #game1 = Game("Hanan", "omnia")
         pygame.display.flip()
         
     elif mode == "Computer_vs_Computer":
@@ -705,8 +733,7 @@ def Game_Handler(mode):
         Draw_White_Gobblets()
         pygame.display.flip()
 
-        #global game1
-        #game1 = Game("Hanan", "omnia")
+        global game1
 
         pygame.display.set_caption("Game Started")
         #Handle the Game based on the difficulty of each AI
@@ -777,16 +804,19 @@ def Game_Handler(mode):
 
 # Main function to run the game
 if __name__ == "__main__":
+    
+    global game1
+
+    game1 = Game("Hanan", "omnia")
+    game1.print_grid()    
+    
     initialize_pygame()
     load_images()
     initialize_fonts()
     initialize_buttons()
     Events_Handler()
 
-    global game1
 
-    game1 = Game("Hanan", "omnia")
-    game1.print_grid()
     
 
 
