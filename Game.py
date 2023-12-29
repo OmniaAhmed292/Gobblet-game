@@ -52,7 +52,7 @@ class Game:
             [Pile(),Pile(),Pile(),Pile()]
             ]
         self.move_history = []  # Changed from self.game_history = []
-        self.possible_moves = []
+        self.possible_moves = None
 
     
     def print_grid(self) -> None:
