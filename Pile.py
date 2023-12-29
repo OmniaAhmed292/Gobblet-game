@@ -29,10 +29,10 @@ class Pile:
     """
     self.rocks = []
     if is_player:
-      self.rocks.append(Rock(1, id))
-      self.rocks.append(Rock(2, id))
-      self.rocks.append(Rock(3, id))
-      self.rocks.append(Rock(4, id))
+      self.rocks.append(Rock(1, id, 0))
+      self.rocks.append(Rock(2, id, 1))
+      self.rocks.append(Rock(3, id, 2))
+      self.rocks.append(Rock(4, id, 3))
 
   def push(self, rock: Rock) -> None:
     """
@@ -45,8 +45,10 @@ class Pile:
       Exception: If the rock being added is smaller than the rocks already in the pile.
     """
     if not self.rocks or self.rocks[-1].size < rock.size:
+      rock.pile_no = len(self.rocks)  # Set the pile_no attribute of the rock
       self.rocks.append(rock)
     else:
+      print(f"Trying to push rock {rock.size} onto pile with top rock size {self.rocks[-1].size}")
       raise Exception("Cannot add small rock into larger ones")
 
   def pop(self) -> Rock:
@@ -63,3 +65,4 @@ class Pile:
       return self.rocks.pop()
     else:
       raise Exception("Cannot remove from empty space")
+
