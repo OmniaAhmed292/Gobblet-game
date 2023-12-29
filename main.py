@@ -434,11 +434,9 @@ def Move_Human_Goblet():
     mouse_pos = pygame.mouse.get_pos()
     
 
-    do_turn_from = (None, None)
-    do_turn_to = (None, None)
+    do_turn_from = Postion(None, None)
+    do_turn_to = Postion(None, None)
 
-    do_turn_from = list(do_turn_from)
-    do_turn_to = list(do_turn_to)
 
   
     i = None
@@ -447,17 +445,18 @@ def Move_Human_Goblet():
     for x in range (4):
 
         if(mouse_pos[0] < 200 or mouse_pos[0] > 600 or mouse_pos[1] < 100 or mouse_pos[1] > 500):
-            do_turn_from[0] = None
-            do_turn_from[1] = None
+            do_turn_from.x = None
+            do_turn_from.y = None
             pass
 
-        if(mouse_pos[0] > (200 + x * 100) and mouse_pos[0] < (200 + (x + 1) * 100)):
-            i = x
-            do_turn_from[0] = x
+        else:
+            if(mouse_pos[0] > (200 + x * 100) and mouse_pos[0] < (200 + (x + 1) * 100)):
+                i = x
+                do_turn_from.y = x
 
-        if(mouse_pos[1] > (100 + x * 100) and mouse_pos[1] < (100 + (x + 1) * 100)):
-            j = x
-            do_turn_from[1] = x
+            if(mouse_pos[1] > (100 + x * 100) and mouse_pos[1] < (100 + (x + 1) * 100)):
+                j = x
+                do_turn_from.x = x
     
     for x in range (4):
         for y in range (3):
@@ -467,13 +466,25 @@ def Move_Human_Goblet():
                 if(turn == "P1"):
                     if (Black_Gobblets_rect[3- x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
-                        do_turn_pile_no = (2 - y)
+                        
+                        if(do_turn_from.x == None or do_turn_from.y == None):
+                            do_turn_pile_no = (2 - y)
+
+                        else:
+                            do_turn_pile_no = None
+                        
                         clicked = True
 
                 elif(turn == "P2"):
                     if (White_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = White_Gobblets_rect[3 - x][2- y]
-                        do_turn_pile_no = (2 - y)
+
+                        if(do_turn_from.x == None or do_turn_from.y == None):
+                            do_turn_pile_no = (2 - y)
+
+                        else:
+                            do_turn_pile_no = None
+
                         clicked = True
 
             elif(mode_selection == "hard_ai_vs_human"):
@@ -507,7 +518,7 @@ def Move_Human_Goblet():
             elif event.type == pygame.MOUSEBUTTONDOWN and clicked:
                 # Second click: move the image
                 mouse_pos = pygame.mouse.get_pos()
-                #minimum = math.sqrt(Table_centers[0][0][0] ** 2 + Table_centers[0][0][1] ** 2)
+                #minimum = math.sqrt(Table_centers[0][0][0] * 2 + Table_centers[0][0][1] * 2)
                 i = None
                 j = None
 
@@ -515,11 +526,11 @@ def Move_Human_Goblet():
 
                     if(mouse_pos[0] > (200 + x * 100) and mouse_pos[0] < (200 + (x + 1) * 100)):
                         i = x
-                        do_turn_to[0] = x
+                        do_turn_to.y = x
 
                     if(mouse_pos[1] > (100 + x * 100) and mouse_pos[1] < (100 + (x + 1) * 100)):
                         j = x
-                        do_turn_to[1] = x
+                        do_turn_to.x = x
 
 
 
@@ -529,15 +540,23 @@ def Move_Human_Goblet():
                     global game1
 
                     if(turn == "P1"):
-                        game1.do_turn(0, Position(do_turn_to[1], do_turn_to[0]), Position(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
+                        game1.do_turn(0, do_turn_to, do_turn_from, from_pile=do_turn_pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
+
+                        if(var1 == True):
+                            #End Game
+                            pass
 
 
                     elif(turn == "P2"):
-                        game1.do_turn(1, Position(do_turn_to[1], do_turn_to[0]), Position(do_turn_from[1], do_turn_from[0]) ,from_pile=do_turn_pile_no)
+                        game1.do_turn(1, do_turn_to, do_turn_from, from_pile=do_turn_pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
+
+                        if(var1 == True):
+                            #End Game
+                            pass
 
                     game1.print_grid()
 
