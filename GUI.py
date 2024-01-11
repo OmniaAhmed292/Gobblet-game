@@ -7,7 +7,6 @@ from min_max import best_move, Random_move
 from Position import Position
 import time
 
-
 # Initialize Pygame
 def initialize_pygame():
     pygame.init()
@@ -62,12 +61,10 @@ def initialize_fonts():
     Game_Name = Game_Name_font.render("Gobblet Game", True, (0, 0, 0))
 
     Player1_Turn_Text_font = pygame.font.Font(None, 35)
-    Player1_Turn_Text = Player1_Turn_Text_font.render(
-        "Player 1 Turn", True, (0, 0, 0))
+    Player1_Turn_Text = Player1_Turn_Text_font.render("Player 1 Turn", True, (0, 0, 0))
 
     Player2_Turn_Text_font = pygame.font.Font(None, 35)
-    Player2_Turn_Text = Player2_Turn_Text_font.render(
-        "Player 2 Turn", True, (0, 0, 0))
+    Player2_Turn_Text = Player2_Turn_Text_font.render("Player 2 Turn", True, (0, 0, 0))
 
 
 # Initialize Buttons
@@ -140,7 +137,6 @@ def initialize_buttons():
     easy_button_text_rect = easy_button_text.get_rect(
         center=easy_button.center)
 
-
 def Enter_Names():
     # Update display based on mode selection
     screen.blit(background_image, (0, 0))
@@ -157,7 +153,7 @@ def Enter_Names():
         (WIDTH - 400) // 2, (HEIGHT + 50) // 2, 400, 50)
     player1_name = ""
     player2_name = ""
-    active_input = None
+    active_input = "player1"  # Start with player 1 as the active input
 
     # Draw input fields for player names
     pygame.draw.rect(screen, (255, 255, 255), player1_input_rect)
@@ -198,27 +194,42 @@ def Enter_Names():
     # Add text to buttons
     screen.blit(Enter_Button_text, Enter_Button_text_rect)
 
-    # Get player names from user input
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if active_input == "player1":
-                if event.key == pygame.K_BACKSPACE:
-                    player1_name = player1_name[:-1]
-                else:
-                    player1_name += event.unicode
-            elif active_input == "player2":
-                if event.key == pygame.K_BACKSPACE:
-                    player2_name = player2_name[:-1]
-                else:
-                    player2_name += event.unicode
+    entering_names = True  # Flag to control the loop
+    while entering_names:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-    # Update player name surfaces
-    player1_surface = input_font.render(player1_name, True, (0, 0, 0))
-    player2_surface = input_font.render(player2_name, True, (0, 0, 0))
-    screen.blit(player1_surface, (player1_input_rect.x +
-                10, player1_input_rect.y + 10))
-    screen.blit(player2_surface, (player2_input_rect.x +
-                10, player2_input_rect.y + 10))
+            if event.type == pygame.KEYDOWN:
+                if active_input == "player1":
+                    if event.key == pygame.K_BACKSPACE:
+                        player1_name = player1_name[:-1]
+                    elif event.key == pygame.K_RETURN:  # Enter key to confirm
+                        active_input = "player2"  # Switch to the next player
+                    else:
+                        player1_name += event.unicode
+                elif active_input == "player2":
+                    if event.key == pygame.K_BACKSPACE:
+                        player2_name = player2_name[:-1]
+                    elif event.key == pygame.K_RETURN:
+                        entering_names = False  # Exit the loop when both names are entered
+                    else:
+                        player2_name += event.unicode
+
+        # Update player name surfaces
+        player1_surface = input_font.render(player1_name, True, (0, 0, 0))
+        player2_surface = input_font.render(player2_name, True, (0, 0, 0))
+        screen.blit(player1_surface, (player1_input_rect.x +
+                    10, player1_input_rect.y + 10))
+        screen.blit(player2_surface, (player2_input_rect.x +
+                    10, player2_input_rect.y + 10))
+
+        pygame.display.flip()  # Update the display
+
+    # After the loop, you can use player1_name and player2_name as the entered names
+    print("Player 1 Name:", player1_name)
+    print("Player 2 Name:", player2_name)
 
 
 def Difficulty_Selection():
@@ -298,10 +309,10 @@ def draw_game_board():
                          (board_offset_x + board_width, board_offset_y + x * square_size))
 
     if (turn == "P2"):
-        screen.blit(Player1_Turn_Text, (300, 550))
+        screen.blit(Player2_Turn_Text, (300, 550))
 
     elif (turn == "P1"):
-        screen.blit(Player2_Turn_Text, (300, 550))
+        screen.blit(Player1_Turn_Text, (300, 550))
 
 
 def Black_Gobblets_Init_Positions():
@@ -685,7 +696,6 @@ def Game_Handler(mode):
 
     elif mode == "Enter_Names":
         Enter_Names()
-
     elif mode == "human_vs_human":
         draw_game_board()
         pygame.display.flip()
@@ -694,6 +704,16 @@ def Game_Handler(mode):
         
         game1 = Game(player1_name, player2_name)
         pygame.display.flip()
+        
+        '''
+        end = False
+        while not end:
+            end, winner = game1.check_win()
+            if end:
+                break
+            # Handle player turns and game logic here
+        '''
+
 
     elif mode == "Computer_vs_Computer":
         draw_game_board()
