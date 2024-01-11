@@ -3,7 +3,7 @@ import sys
 import os
 import time
 from Game import Game
-from min_max import best_move, Random_move
+from Logic import best_move, Random_move
 from Position import Position
 import time
 
