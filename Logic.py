@@ -7,6 +7,7 @@ import time
 # Global variable to store memoized results
 memoization_cache = {}
 MAX_TIME_SECONDS = 60
+RANDOM_TURNS = 2
 # Call this function to get possible moves once per turn
 def possible_move(game, player_id):
     available_sizes = set()
@@ -37,6 +38,10 @@ def possible_move(game, player_id):
 
 
 def best_move(game: Game, is_max: bool, player_id: int) -> tuple[Position, Position, int, int, int]:
+    if game.player[player_id].turns < RANDOM_TURNS:
+        # Make the first few moves random for each player:
+        print("Random Move!")
+        return Random_move(game, player_id)
     sz = 0
     p_no = 0
     f, t = 0, 0
@@ -323,7 +328,7 @@ def evaluation_function(game: Game, player_id, to_grid: Position, from_grid: Pos
 def Random_move(game: Game, player_id) -> tuple[Position, Position, int, int, int]:
     random_move = random.choice(possible_move(game, player_id))
     to_grid, from_grid, from_pile = random_move
-
+    time.sleep(3)
     sz = 0
     p_no = 0
 

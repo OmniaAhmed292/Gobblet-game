@@ -26,7 +26,6 @@ class Game:
             [Pile(-1), Pile(-1), Pile(-1), Pile(-1)]
         ]
         self.best_move = None
-
     def print_grid(self) -> None:
         for row in self.grid:
             for cell in row:
@@ -150,6 +149,7 @@ class Game:
 
     def do_turn(self, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> None:
         self.is_valid(player_id, to_grid, from_grid, from_pile)
+        self.player[player_id].turns += 1
         if from_pile != None:
             self.grid[to_grid.x][to_grid.y].push(
                 self.player[player_id].piles[from_pile].pop())
@@ -202,5 +202,6 @@ class Game:
                range(4)):
             return True, self.grid[0][3].rocks[-1].id
         return False, -1
+
 
 
