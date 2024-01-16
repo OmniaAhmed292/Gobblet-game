@@ -44,7 +44,6 @@ def best_move(game: Game, is_max: bool, player_id: int) -> tuple[Position, Posit
     move = None
     for to_grid, from_grid, from_pile in possible_move(game, player_id):
         game.do_turn(player_id, to_grid, from_grid, from_pile)
-        # score = alpha_beta(game, is_max, player_id, to_grid, from_grid, from_pile, 1)
         score = iterative_deepening(game, is_max, player_id, to_grid, from_grid, from_pile, 1)
         game.undo_turn(player_id, to_grid, from_grid, from_pile)
         if score > best_score:
