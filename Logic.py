@@ -2,10 +2,11 @@ from Game import Game
 from Position import Position
 import math
 import random
+import time
 
 # Global variable to store memoized results
 memoization_cache = {}
-
+MAX_TIME_SECONDS = 60
 # Call this function to get possible moves once per turn
 def possible_move(game, player_id):
     available_sizes = set()
@@ -43,7 +44,8 @@ def best_move(game: Game, is_max: bool, player_id: int) -> tuple[Position, Posit
     move = None
     for to_grid, from_grid, from_pile in possible_move(game, player_id):
         game.do_turn(player_id, to_grid, from_grid, from_pile)
-        score = alpha_beta(game, is_max, player_id, to_grid, from_grid, from_pile, 1)
+        # score = alpha_beta(game, is_max, player_id, to_grid, from_grid, from_pile, 1)
+        score = iterative_deepening(game, is_max, player_id, to_grid, from_grid, from_pile, 1)
         game.undo_turn(player_id, to_grid, from_grid, from_pile)
         if score > best_score:
             best_score = score
@@ -137,6 +139,25 @@ def alpha_beta(game: Game, is_max_player, player_id, to_grid, from_grid, from_pi
                 break  # Alpha cut-off
         return min_val
 
+def iterative_deepening(game: Game, is_max_player, player_id, to_grid, from_grid, from_pile, max_depth=10, alpha=-math.inf, beta=math.inf) -> int:
+    # print("HELLO DEEP!")
+    start_time = time.time()
+    best_move = None
+    for depth in range(1,max_depth+1):
+        current_time = time.time()
+        if current_time - start_time > MAX_TIME_SECONDS:
+            print("Time limit exceeded!")
+            break
+        if  not best_move == None and best_move >= 70:
+            print("Best move exceeds 70!")
+            break
+        move = alpha_beta(game, is_max_player, player_id, to_grid, from_grid, from_pile, depth, alpha, beta)
+        if best_move is None or best_move<move:
+            best_move = move
+
+    return best_move
+
+    
 
 def evaluation_function(game: Game, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> int:
     sum_row, sum_col, sum_diag, sum_anti_diag = 0, 0, 0, 0
