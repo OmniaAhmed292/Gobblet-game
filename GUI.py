@@ -138,6 +138,7 @@ def initialize_buttons():
         center=easy_button.center)
 
 def Enter_Names():
+        
     # Update display based on mode selection
     screen.blit(background_image, (0, 0))
 
@@ -147,13 +148,12 @@ def Enter_Names():
 
     # Input fields for player names
     input_font = pygame.font.Font(None, 36)
-    player1_input_rect = pygame.Rect(
-        (WIDTH - 400) // 2, (HEIGHT - 150) // 2, 400, 50)
-    player2_input_rect = pygame.Rect(
-        (WIDTH - 400) // 2, (HEIGHT + 50) // 2, 400, 50)
+    player1_input_rect = pygame.Rect((WIDTH - 400) // 2, (HEIGHT - 150) // 2, 400, 50)
+    player2_input_rect = pygame.Rect((WIDTH - 400) // 2, (HEIGHT + 50) // 2, 400, 50)
     player1_name = ""
     player2_name = ""
-    active_input = "player1"  # Start with player 1 as the active input
+    active_input = None
+    
 
     # Draw input fields for player names
     pygame.draw.rect(screen, (255, 255, 255), player1_input_rect)
@@ -161,76 +161,34 @@ def Enter_Names():
 
     player1_surface = input_font.render(player1_name, True, (0, 0, 0))
     player2_surface = input_font.render(player2_name, True, (0, 0, 0))
-    screen.blit(player1_surface, (player1_input_rect.x +
-                10, player1_input_rect.y + 10))
-    screen.blit(player2_surface, (player2_input_rect.x +
-                10, player2_input_rect.y + 10))
+    screen.blit(player1_surface, (player1_input_rect.x + 10, player1_input_rect.y + 10))
+    screen.blit(player2_surface, (player2_input_rect.x + 10, player2_input_rect.y + 10))
 
     # Text above input fields
     text_font = pygame.font.Font(None, 24)
     player1_text_surface = text_font.render("Player 1 Name:", True, (0, 0, 0))
     player2_text_surface = text_font.render("Player 2 Name:", True, (0, 0, 0))
-    screen.blit(player1_text_surface,
-                (player1_input_rect.x, player1_input_rect.y - 30))
-    screen.blit(player2_text_surface,
-                (player2_input_rect.x, player2_input_rect.y - 30))
+    screen.blit(player1_text_surface, (player1_input_rect.x, player1_input_rect.y - 30))
+    screen.blit(player2_text_surface, (player2_input_rect.x, player2_input_rect.y - 30))
 
-    # Render text for buttons
+    #Render text for buttons
     Enter_Button_Font = pygame.font.Font(None, 30)
     Text_Color = (255, 255, 255)
 
-    # Enter Button
-    Enter_Button_rect = pygame.Rect(500, 450, 200, 50)
-    Enter_Button_text = Enter_Button_Font.render(
-        "Enter Game", True, Text_Color)
+    #Enter Button
+    Enter_Button_rect = pygame.Rect(500, 450, 200, 50)  
+    Enter_Button_text = Enter_Button_Font.render("Enter Game", True, Text_Color)
 
     # Get text rectangles for centering
-    Enter_Button_text_rect = Enter_Button_text.get_rect(
-        center=Enter_Button_rect.center)
+    Enter_Button_text_rect = Enter_Button_text.get_rect(center=Enter_Button_rect.center)
 
-    # Draw Buttons
+
+    #Draw Buttons
     pygame.draw.rect(screen, (0, 0, 0), Enter_Button_rect)
 
-    # Add text to buttons
+
+    #Add text to buttons
     screen.blit(Enter_Button_text, Enter_Button_text_rect)
-
-    entering_names = True  # Flag to control the loop
-    while entering_names:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                if active_input == "player1":
-                    if event.key == pygame.K_BACKSPACE:
-                        player1_name = player1_name[:-1]
-                    elif event.key == pygame.K_RETURN:  # Enter key to confirm
-                        active_input = "player2"  # Switch to the next player
-                    else:
-                        player1_name += event.unicode
-                elif active_input == "player2":
-                    if event.key == pygame.K_BACKSPACE:
-                        player2_name = player2_name[:-1]
-                    elif event.key == pygame.K_RETURN:
-                        entering_names = False  # Exit the loop when both names are entered
-                    else:
-                        player2_name += event.unicode
-
-        # Update player name surfaces
-        player1_surface = input_font.render(player1_name, True, (0, 0, 0))
-        player2_surface = input_font.render(player2_name, True, (0, 0, 0))
-        screen.blit(player1_surface, (player1_input_rect.x +
-                    10, player1_input_rect.y + 10))
-        screen.blit(player2_surface, (player2_input_rect.x +
-                    10, player2_input_rect.y + 10))
-
-        pygame.display.flip()  # Update the display
-
-    # After the loop, you can use player1_name and player2_name as the entered names
-    print("Player 1 Name:", player1_name)
-    print("Player 2 Name:", player2_name)
-
 
 def Difficulty_Selection():
     # Draw the buttons for difficulty selection screen
@@ -447,13 +405,34 @@ def move_gobblet(Gobblet_rect, grid_centers_tuple):
 
 
 def Move_Human_Goblet():
-    global selected_image, turn
+    global selected_image, turn, pile_no, game1
     clicked = False
 
     # First click: select the image
     mouse_pos = pygame.mouse.get_pos()
 
-    global pile_no, game1
+    do_turn_from = Position(None, None)
+    do_turn_to = Position(None, None)
+  
+    i = None
+    j = None
+
+
+    for x in range (4):
+
+        if(mouse_pos[0] < 200 or mouse_pos[0] > 600 or mouse_pos[1] < 100 or mouse_pos[1] > 500):
+            do_turn_from.x = None
+            do_turn_from.y = None
+            pass
+
+        else:
+            if(mouse_pos[0] > (200 + x * 100) and mouse_pos[0] < (200 + (x + 1) * 100)):
+                i = x
+                do_turn_from.y = x
+
+            if(mouse_pos[1] > (100 + x * 100) and mouse_pos[1] < (100 + (x + 1) * 100)):
+                j = x
+                do_turn_from.x = x
 
     for x in range(4):
         for y in range(3):
@@ -515,6 +494,8 @@ def Move_Human_Goblet():
 
                 if selected_image:
                     move_gobblet(selected_image, Table_centers[i][j])
+
+                    global game1
 
                     if (turn == "P1"):
                         game1.do_turn(0, Position(j, i), from_pile=pile_no)
