@@ -3,6 +3,7 @@ from Position import Position
 import math
 import random
 import time
+from collections import Counter
 
 # Global variable to store memoized results
 memoization_cache = {}
@@ -38,10 +39,12 @@ def possible_move(game, player_id):
 
 
 def best_move(game: Game, is_max: bool, player_id: int) -> tuple[Position, Position, int, int, int]:
+    '''
     if game.player[player_id].turns < RANDOM_TURNS:
         # Make the first few moves random for each player:
         print("Random Move!")
         return Random_move(game, player_id)
+    '''
     sz = 0
     p_no = 0
     f, t = 0, 0
@@ -143,26 +146,68 @@ def alpha_beta(game: Game, is_max_player, player_id, to_grid, from_grid, from_pi
                 break  # Alpha cut-off
         return min_val
 
-def iterative_deepening(game: Game, is_max_player, player_id, to_grid, from_grid, from_pile, max_depth=10, alpha=-math.inf, beta=math.inf) -> int:
-    # print("HELLO DEEP!")
+def iterative_deepening(game, is_max_player, player_id, to_grid, from_grid, from_pile, max_depth=10, alpha=-math.inf, beta=math.inf) -> int:
     start_time = time.time()
     best_move = None
-    for depth in range(1,max_depth+1):
+
+    for depth in range(1, max_depth + 1):
         current_time = time.time()
         if current_time - start_time > MAX_TIME_SECONDS:
             print("Time limit exceeded!")
             break
-        if  not best_move == None and best_move >= 70:
+
+        if not best_move == None and best_move >= 70:
             print("Best move exceeds 70!")
             break
+
         move = alpha_beta(game, is_max_player, player_id, to_grid, from_grid, from_pile, depth, alpha, beta)
-        if best_move is None or best_move<move:
+        
+        # Update the best move if necessary
+        if best_move is None or best_move < move:
             best_move = move
 
     return best_move
 
-    
+# Constants
+GRID_SIZE = 4
+INFINITY = math.inf
 
+def evaluate_line(line, player_id):
+    gobblet_count = line.count(player_id)
+    empty_count = line.count(None)
+
+    if gobblet_count == 1 and empty_count == 3:
+        return 1
+    elif gobblet_count == 2 and empty_count == 2:
+        return 10
+    elif gobblet_count == 3 and empty_count == 1:
+        return 100
+    elif gobblet_count == 4 and empty_count == 0:
+        return INFINITY
+    elif gobblet_count == 0 and empty_count == 4:
+        return 0
+    else:
+        return 0
+
+def evaluation_function(game, player_id, to_grid, from_grid=None, from_pile=None):
+    row_score, col_score, diag_score, anti_diag_score = 0, 0, 0, 0
+
+    for i in range(GRID_SIZE):
+        row_line = [game.grid[i][j].rocks[-1].id if game.grid[i][j].rocks else None for j in range(GRID_SIZE)]
+        col_line = [game.grid[j][i].rocks[-1].id if game.grid[j][i].rocks else None for j in range(GRID_SIZE)]
+        diag_line = [game.grid[j][j].rocks[-1].id if game.grid[j][j].rocks else None for j in range(GRID_SIZE)]
+        anti_diag_line = [game.grid[j][GRID_SIZE - 1 - j].rocks[-1].id if game.grid[j][GRID_SIZE - 1 - j].rocks else None for j in range(GRID_SIZE)]
+
+        row_score += evaluate_line(row_line, player_id)
+        col_score += evaluate_line(col_line, player_id)
+        diag_score += evaluate_line(diag_line, player_id)
+        anti_diag_score += evaluate_line(anti_diag_line, player_id)
+
+    total_weight = row_score + col_score + diag_score + anti_diag_score
+
+    return total_weight
+
+'''
 def evaluation_function(game: Game, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> int:
     sum_row, sum_col, sum_diag, sum_anti_diag = 0, 0, 0, 0
 
@@ -323,7 +368,7 @@ def evaluation_function(game: Game, player_id, to_grid: Position, from_grid: Pos
     # Memoize the result before returning
     memoization_cache[key] = total_weight
     return total_weight
-
+'''
 
 def Random_move(game: Game, player_id) -> tuple[Position, Position, int, int, int]:
     random_move = random.choice(possible_move(game, player_id))
