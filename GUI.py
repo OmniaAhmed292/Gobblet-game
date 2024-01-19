@@ -69,10 +69,10 @@ def initialize_fonts():
 
 # Initialize Buttons
 def initialize_buttons():
-    global human_vs_human_button, human_vs_computer_button, computer_vs_computer_button, back_button_rect
-    global human_vs_human_text, human_vs_computer_text, computer_vs_computer_text
-    global human_vs_human_text_rect, human_vs_computer_text_rect, computer_vs_computer_text_rect
-
+    global human_vs_human_button, human_vs_computer_button, computer_vs_computer_button, back_button_rect, restart_button, quit_button
+    global human_vs_human_text, human_vs_computer_text, computer_vs_computer_text, restart_text, quit_text
+    global human_vs_human_text_rect, human_vs_computer_text_rect, computer_vs_computer_text_rect, restart_text_rect, quit_text_rect
+    
     # difficulty buttons
     global hard_button, easy_button
     global hard_button_text, easy_button_text
@@ -108,6 +108,12 @@ def initialize_buttons():
     easy_button = pygame.Rect((WIDTH - button_width_difficulty) // 2,
                               difficulty_button_y + button_height_difficulty + difficulty_button_spacing,
                               button_width_difficulty, button_height_difficulty)
+    
+    restart_button = pygame.Rect((WIDTH - button_width_difficulty) // 2, difficulty_button_y, button_width_difficulty,
+                              button_height_difficulty)
+    quit_button = pygame.Rect((WIDTH - button_width_difficulty) // 2,
+                              difficulty_button_y + button_height_difficulty + difficulty_button_spacing,
+                              button_width_difficulty, button_height_difficulty)
 
     # Render text for buttons
     button_font = pygame.font.Font(None, 30)
@@ -124,6 +130,10 @@ def initialize_buttons():
         "Hard", True, (255, 255, 255))
     easy_button_text = difficulty_text_font.render(
         "Easy", True, (255, 255, 255))
+    restart_text = difficulty_text_font.render(
+        "Restart", True, (255, 255, 255))
+    quit_text = difficulty_text_font.render(
+        "Quit", True, (255, 255, 255))
 
     # Get text rectangles for centering
     human_vs_human_text_rect = human_vs_human_text.get_rect(
@@ -136,7 +146,51 @@ def initialize_buttons():
         center=hard_button.center)
     easy_button_text_rect = easy_button_text.get_rect(
         center=easy_button.center)
+    restart_text_rect = restart_text.get_rect(
+        center=restart_button.center)
+    quit_text_rect = quit_text.get_rect(
+        center=quit_button.center)
 
+
+def Game_Over():
+    # Update display based on mode selection
+    #screen.fill((220, 220, 220))
+    # Update display based on mode selection
+    screen.blit(background_image, (0, 0))
+    global  input_font, WIDTH, HEIGHT
+    text_font = pygame.font.Font(None, 100)
+    Game_Over_text_surface = text_font.render("Game Over!", True, (200, 150, 50))
+    # Get the rectangle of the text surface
+    game_over_rect = Game_Over_text_surface.get_rect()
+
+    # Center the text on the screen
+    game_over_rect.center = ( WIDTH // 2,35)
+    screen.blit(Game_Over_text_surface, game_over_rect)
+    
+    # Set the font and size for the winner player text
+    winner_font = pygame.font.Font(None, 75)  
+
+    # Create a text surface for the winner player text with black color
+    winner_text_surface = winner_font.render(f"The winner is {winner}", True,(140, 180, 200))  # Black text color
+
+    # Get the rectangle of the winner player text surface
+    winner_rect = winner_text_surface.get_rect()
+
+    # Center the winner player text below the "Game Over!" text
+    winner_rect.midtop = (WIDTH // 2, game_over_rect.bottom + 50)
+
+    # Blit the winner player text surface onto the screen
+    screen.blit(winner_text_surface, winner_rect)
+    
+    # Draw Buttons
+    pygame.draw.rect(screen, (0, 0, 0), restart_button)
+    pygame.draw.rect(screen, (0, 0, 0), quit_button)
+
+    # Add text to buttons
+    screen.blit(restart_text, restart_text_rect)
+    screen.blit(quit_text, quit_text_rect)
+    
+    
 def Enter_Names():
         
     # Update display based on mode selection
@@ -405,7 +459,7 @@ def move_gobblet(Gobblet_rect, grid_centers_tuple):
 
 
 def Move_Human_Goblet():
-    global selected_image, turn, pile_no, game1
+    global selected_image, turn, pile_no, game1, mode_selection
     clicked = False
 
     # First click: select the image
@@ -517,7 +571,14 @@ def Move_Human_Goblet():
 
     elif (turn == "P2"):
         turn = "P1"
-
+    # Inside Move_Human_Goblet() after making the move:
+    var1, var2 = game1.check_win()
+    if var1:  # Assuming var1 indicates a win condition
+        mode_selection = "game_over"
+        global winner
+        winner = "Player 1" if turn == "P2" else "Player 2"
+        Game_Handler(mode_selection)
+        print(f"{winner} wins!")
 
 # Main Game Loop
 def Events_Handler():
@@ -549,7 +610,7 @@ def Events_Handler():
                     if human_vs_human_button.collidepoint(event.pos):
                         # Handle Human vs Human mode selection
                         previous_mode = mode_selection  # Assign previous mode before changing
-                        mode_selection = "Enter_Names"  # Transition to Human vs Human mode
+                        mode_selection = "Enter_Names"  # Transition to Enter names mode
                         Game_Handler(mode_selection)
                     elif human_vs_computer_button.collidepoint(event.pos):
                         previous_mode = mode_selection
@@ -623,7 +684,18 @@ def Events_Handler():
 
                 elif mode_selection == "easy_ai_vs_human" or mode_selection == "hard_ai_vs_human" or mode_selection == "human_vs_human":
                     Move_Human_Goblet()
+                                   
+                elif mode_selection == "game_over":
+                   if restart_button.collidepoint(event.pos):
+                        
+                        previous_mode = mode_selection  # Assign previous mode before changing
+                        mode_selection = "start_menu"
+                        Game_Handler(mode_selection)
 
+                   elif quit_button.collidepoint(event.pos):
+                        pygame.quit()
+                        sys.exit()
+                   
             elif event.type == pygame.KEYDOWN:
                 if mode_selection == "Enter_Names" and active_input:
                     # Handle keyboard input for entering player names
@@ -713,6 +785,7 @@ def Game_Handler(mode):
 
             end = False
             while not end:
+                global winner
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = best_move(game1, True, 0)
                 game1.do_turn(0, to, frm, pile)
@@ -727,8 +800,18 @@ def Game_Handler(mode):
                 move_gobblet(
                     White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
+                
                 end, winner = game1.check_win()
                 print(end, winner)
+                
+                #  after making the move:
+                var1, var2 = game1.check_win()
+                if var1:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
 
         elif ai_1_difficulty == "easy" and ai_2_difficulty == "easy":
             end = False
@@ -750,6 +833,14 @@ def Game_Handler(mode):
                 time.sleep(2)
                 end, winner = game1.check_win()
                 print(end, winner)
+                #  after making the move:
+                var1, var2 = game1.check_win()
+                if var1:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
             # call the algorithm that handle this case
             print("easy vs easy")
         elif ai_1_difficulty == "easy" and ai_2_difficulty == "hard":
@@ -773,6 +864,14 @@ def Game_Handler(mode):
                 game1.print_grid()
                 end, winner = game1.check_win()
                 print(end, winner)
+                #  after making the move:
+                var1, var2 = game1.check_win()
+                if var1:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
             print("easy vs hard")
         elif ai_1_difficulty == "hard" and ai_2_difficulty == "easy":
             # call the algorithm that handle this case
@@ -795,6 +894,14 @@ def Game_Handler(mode):
                 game1.print_grid()
                 end, winner = game1.check_win()
                 print(end, winner)
+                #  after making the move:
+                var1, var2 = game1.check_win()
+                if var1:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
             print("hard vs easy")
 
     elif mode == "ai_vs_human_difficulty_selection":
@@ -826,5 +933,11 @@ def Game_Handler(mode):
 
         Difficulty_Selection()
         pygame.display.set_caption("Difficulty Selection For Player 2 ")
+        
+    elif mode == "game_over":
+        pygame.display.set_caption("Game Over!")
+        Game_Over()
+
+            
 
     pygame.display.flip()
