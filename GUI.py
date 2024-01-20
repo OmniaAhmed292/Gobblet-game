@@ -320,11 +320,11 @@ def draw_game_board():
         pygame.draw.line(screen, (0, 0, 0), (board_offset_x, board_offset_y + x * square_size),
                          (board_offset_x + board_width, board_offset_y + x * square_size))
 
-    if (turn == "P2"):
-        screen.blit(Player2_Turn_Text, (300, 550))
-
-    elif (turn == "P1"):
+    if (turn == "P1"):
         screen.blit(Player1_Turn_Text, (300, 550))
+
+    elif (turn == "P2"):
+        screen.blit(Player2_Turn_Text, (300, 550))
 
 
 def Black_Gobblets_Init_Positions():
@@ -510,6 +510,7 @@ def Move_Human_Goblet():
                 if (turn == "P1"):
                     if (Black_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
+                        pile_no = (2 - y)
                         clicked = True
 
                 elif (turn == "P2"):
@@ -520,6 +521,7 @@ def Move_Human_Goblet():
                 if (turn == "P1"):
                     if (Black_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
+                        pile_no = (2 - y)
                         clicked = True
 
                 elif (turn == "P2"):
@@ -547,16 +549,21 @@ def Move_Human_Goblet():
                         j = x
 
                 if selected_image:
-                    move_gobblet(selected_image, Table_centers[i][j])
 
                     global game1
 
                     if (turn == "P1"):
+                        turn = "P2"
+                        draw_game_board()
+                        move_gobblet(selected_image, Table_centers[i][j])
                         game1.do_turn(0, Position(j, i), from_pile=pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
                     elif (turn == "P2"):
+                        turn = "P1"
+                        draw_game_board()
+                        move_gobblet(selected_image, Table_centers[i][j])
                         game1.do_turn(1, Position(j, i), from_pile=pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
@@ -566,11 +573,11 @@ def Move_Human_Goblet():
                     clicked = False
                     selected_image = None
 
-    if (turn == "P1"):
-        turn = "P2"
+    #if (turn == "P1"):
+    #    turn = "P2"
 
-    elif (turn == "P2"):
-        turn = "P1"
+    #elif (turn == "P2"):
+    #    turn = "P1"
     # Inside Move_Human_Goblet() after making the move:
     var1, var2 = game1.check_win()
     if var1:  # Assuming var1 indicates a win condition
@@ -589,6 +596,7 @@ def Events_Handler():
     global active_input, player1_name, player2_name, player1_input_rect, player2_input_rect
 
     global ai_1_difficulty, ai_2_difficulty
+
 
     mode_selection = "start_menu"  # Default mode
     previous_mode = ""  # Track previous mode
@@ -730,6 +738,8 @@ def Events_Handler():
 def Game_Handler(mode):
     global ai_1_difficulty, ai_2_difficulty
     global game1
+    global turn
+    global mode_selection
     if mode == "start_menu":
 
         # Update display based on mode selection
@@ -789,14 +799,26 @@ def Game_Handler(mode):
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = best_move(game1, True, 0)
                 game1.do_turn(0, to, frm, pile)
+                turn = "P2"
+                draw_game_board()
                 move_gobblet(
                     Black_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
 
-                # move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
+                end, winner = game1.check_win()
+                print(end, winner)
+                if end:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
+                    return
 
                 to, frm, pile, pn, sz = best_move(game1, False, 1)
                 game1.do_turn(1, to, frm, pile)
+                turn = "P1"
+                draw_game_board()
                 move_gobblet(
                     White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
@@ -804,14 +826,13 @@ def Game_Handler(mode):
                 end, winner = game1.check_win()
                 print(end, winner)
                 
-                #  after making the move:
-                var1, var2 = game1.check_win()
-                if var1:  # Assuming var1 indicates a win condition
+                if end:  # Assuming var1 indicates a win condition
                     mode_selection = "game_over"
                     
                     winner = "Player 1" if turn == "P2" else "Player 2"
                     Game_Handler(mode_selection)
                     print(f"{winner} wins!")
+                    return
 
         elif ai_1_difficulty == "easy" and ai_2_difficulty == "easy":
             end = False
@@ -819,12 +840,26 @@ def Game_Handler(mode):
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = Random_move(game1, 0)
                 game1.do_turn(0, to, frm, pile)
+                turn = "P2"
+                draw_game_board()
                 move_gobblet(
                     Black_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
                 time.sleep(2)
                 # move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
 
+                end, winner = game1.check_win()
+                print(end, winner)
+                if end:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
+                    return
+
+                turn = "P1"
+                draw_game_board()
                 to, frm, pile, pn, sz = Random_move(game1, 1)
                 game1.do_turn(1, to, frm, pile)
                 move_gobblet(
@@ -833,14 +868,13 @@ def Game_Handler(mode):
                 time.sleep(2)
                 end, winner = game1.check_win()
                 print(end, winner)
-                #  after making the move:
-                var1, var2 = game1.check_win()
-                if var1:  # Assuming var1 indicates a win condition
+                if end:  # Assuming var1 indicates a win condition
                     mode_selection = "game_over"
                     
                     winner = "Player 1" if turn == "P2" else "Player 2"
                     Game_Handler(mode_selection)
                     print(f"{winner} wins!")
+                    return
             # call the algorithm that handle this case
             print("easy vs easy")
         elif ai_1_difficulty == "easy" and ai_2_difficulty == "hard":
@@ -851,27 +885,42 @@ def Game_Handler(mode):
                 to, frm, pile, pn, sz = Random_move(game1, 0)
                 time.sleep(2)
                 game1.do_turn(0, to, frm, pile)
+                turn = "P2"
+                draw_game_board()
                 move_gobblet(
                     Black_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
 
-                # move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
-
-                to, frm, pile, pn, sz = best_move(game1, True, 1)
-                game1.do_turn(1, to, frm, pile)
-                move_gobblet(
-                    White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
-                game1.print_grid()
                 end, winner = game1.check_win()
                 print(end, winner)
-                #  after making the move:
-                var1, var2 = game1.check_win()
-                if var1:  # Assuming var1 indicates a win condition
+                if end:  # Assuming var1 indicates a win condition
                     mode_selection = "game_over"
                     
                     winner = "Player 1" if turn == "P2" else "Player 2"
                     Game_Handler(mode_selection)
                     print(f"{winner} wins!")
+                    return
+
+                # move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
+
+                to, frm, pile, pn, sz = best_move(game1, True, 1)
+                game1.do_turn(1, to, frm, pile)
+                turn = "P1"
+                draw_game_board()
+                move_gobblet(
+                    White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
+                game1.print_grid()
+                end, winner = game1.check_win()
+                print(end, winner)
+
+                if end:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
+                    return
+
             print("easy vs hard")
         elif ai_1_difficulty == "hard" and ai_2_difficulty == "easy":
             # call the algorithm that handle this case
@@ -880,28 +929,42 @@ def Game_Handler(mode):
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = best_move(game1, False, 0)
                 game1.do_turn(0, to, frm, pile)
+                turn = "P2"
+                draw_game_board()
                 move_gobblet(
                     Black_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
+                
+                end, winner = game1.check_win()
+                print(end, winner)
+                if end:  # Assuming var1 indicates a win condition
+                    mode_selection = "game_over"
+                    
+                    winner = "Player 1" if turn == "P2" else "Player 2"
+                    Game_Handler(mode_selection)
+                    print(f"{winner} wins!")
+                    return
 
                 # move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
 
                 to, frm, pile, pn, sz = Random_move(game1, 1)
                 time.sleep(2)
                 game1.do_turn(1, to, frm, pile)
+                turn = "P2"
+                draw_game_board()
                 move_gobblet(
                     White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
                 end, winner = game1.check_win()
                 print(end, winner)
-                #  after making the move:
-                var1, var2 = game1.check_win()
-                if var1:  # Assuming var1 indicates a win condition
+
+                if end:  # Assuming var1 indicates a win condition
                     mode_selection = "game_over"
                     
                     winner = "Player 1" if turn == "P2" else "Player 2"
                     Game_Handler(mode_selection)
                     print(f"{winner} wins!")
+                    return
             print("hard vs easy")
 
     elif mode == "ai_vs_human_difficulty_selection":
@@ -912,6 +975,7 @@ def Game_Handler(mode):
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        game1 = Game("player1_name", "player2_name")
         pygame.display.flip()
 
         pygame.display.set_caption("Game Started")
@@ -920,6 +984,7 @@ def Game_Handler(mode):
         draw_game_board()
         Draw_Black_Gobblets()
         Draw_White_Gobblets()
+        game1 = Game("player1_name", "player2_name")
         pygame.display.flip()
 
         pygame.display.set_caption("Game Started")
