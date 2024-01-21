@@ -471,7 +471,7 @@ def Move_Human_Goblet():
     i = None
     j = None
 
-
+    
     for x in range (4):
 
         if(mouse_pos[0] < 200 or mouse_pos[0] > 600 or mouse_pos[1] < 100 or mouse_pos[1] > 500):
@@ -690,8 +690,18 @@ def Events_Handler():
                         mode_selection = "Computer_vs_Computer"
                         Game_Handler(mode_selection)
 
-                elif mode_selection == "easy_ai_vs_human" or mode_selection == "hard_ai_vs_human" or mode_selection == "human_vs_human":
+                elif mode_selection == "human_vs_human":
                     Move_Human_Goblet()
+
+                elif  mode_selection == "hard_ai_vs_human":
+                    Move_Human_Goblet()
+                    mode_selection = "hard_ai_vs_human"
+                    Game_Handler(mode_selection)
+
+                elif mode_selection == "easy_ai_vs_human":
+                    Move_Human_Goblet()
+                    mode_selection = "easy_ai_vs_human"
+                    Game_Handler(mode_selection)
                                    
                 elif mode_selection == "game_over":
                    if restart_button.collidepoint(event.pos):
@@ -734,12 +744,15 @@ def Events_Handler():
                     player2_surface, (player2_input_rect.x + 10, player2_input_rect.y + 10))
                 pygame.display.flip()
 
+flag=1
 
 def Game_Handler(mode):
     global ai_1_difficulty, ai_2_difficulty
     global game1
     global turn
     global mode_selection
+    global flag
+
     if mode == "start_menu":
 
         # Update display based on mode selection
@@ -971,23 +984,74 @@ def Game_Handler(mode):
         Difficulty_Selection()
 
     elif mode == "hard_ai_vs_human":
-        
-        draw_game_board()
-        Draw_Black_Gobblets()
-        Draw_White_Gobblets()
-        game1 = Game("player1_name", "player2_name")
-        pygame.display.flip()
+        if(flag==1):
+            draw_game_board()
+            Draw_Black_Gobblets()
+            Draw_White_Gobblets()
+            game1 = Game("player1_name", "player2_name")
+            pygame.display.flip()
+            pygame.display.set_caption("Game Started")
+            flag=0
+            end=False
 
-        pygame.display.set_caption("Game Started")
+        # Handle the Game with AI Hard and Human
+        print("hard vs human")
+        if(turn=="P2"):
+            to, frm, pile, pn, sz = best_move(game1, True, 1)
+            game1.do_turn(1, to, frm, pile)
+            turn = "P1"
+            draw_game_board()
+            move_gobblet(
+                White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
+            game1.print_grid()
+            end, winner = game1.check_win()
+            print(end, winner)
+
+            if end:  # Assuming var1 indicates a win condition
+                mode_selection = "game_over"
+                flag=1
+                winner = "Player 1" if turn == "P2" else "Player 2"
+                Game_Handler(mode_selection)
+                print(f"{winner} wins!")
+                
+                return
+
+        
+      
 
     elif mode == "easy_ai_vs_human":
-        draw_game_board()
-        Draw_Black_Gobblets()
-        Draw_White_Gobblets()
-        game1 = Game("player1_name", "player2_name")
-        pygame.display.flip()
+        if(flag==1):
+            draw_game_board()
+            Draw_Black_Gobblets()
+            Draw_White_Gobblets()
+            game1 = Game("player1_name", "player2_name")
+            pygame.display.flip()
+            pygame.display.set_caption("Game Started")
+            flag=0
+            end=False
 
-        pygame.display.set_caption("Game Started")
+        # Handle the Game with AI Hard and Human
+        print("Easy vs human")
+        if(turn=="P2"):
+            to, frm, pile, pn, sz = Random_move(game1, 1)
+            game1.do_turn(1, to, frm, pile)
+            turn = "P1"
+            draw_game_board()
+            move_gobblet(
+                White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
+            game1.print_grid()
+            end, winner = game1.check_win()
+            print(end, winner)
+
+            if end:  # Assuming var1 indicates a win condition
+                mode_selection = "game_over"
+                flag=1
+                winner = "Player 1" if turn == "P2" else "Player 2"
+                Game_Handler(mode_selection)
+                print(f"{winner} wins!")
+                
+                return
+
 
     elif mode == "ai_1_difficulty_selection":
 
