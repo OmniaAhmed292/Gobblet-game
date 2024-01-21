@@ -10,7 +10,7 @@ memoization_cache = {}
 MAX_TIME_SECONDS = 60
 RANDOM_TURNS = 2
 # Call this function to get possible moves once per turn
-def possible_move(game, player_id):
+def possible_move(game, player_id) ->  List[Tuple[Position, Position, int]]:
     available_sizes = set()
     available_piles = []
 
@@ -172,7 +172,7 @@ def iterative_deepening(game, is_max_player, player_id, to_grid, from_grid, from
 GRID_SIZE = 4
 INFINITY = math.inf
 
-def evaluate_line(line, player_id):
+def evaluate_line(line, player_id) -> int:
     gobblet_count = line.count(player_id)
     empty_count = line.count(None)
 
@@ -189,7 +189,7 @@ def evaluate_line(line, player_id):
     else:
         return 0
 
-def evaluation_function(game, player_id, to_grid, from_grid=None, from_pile=None):
+def evaluation_function(game, player_id, to_grid, from_grid=None, from_pile=None) -> int:
     row_score, col_score, diag_score, anti_diag_score = 0, 0, 0, 0
 
     for i in range(GRID_SIZE):
