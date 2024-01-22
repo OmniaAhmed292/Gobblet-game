@@ -568,7 +568,8 @@ def Move_Human_Goblet():
                         turn = "P2"
                         draw_game_board()
                         move_gobblet(selected_image, Table_centers[i][j])
-                        game1.do_turn(0, Position(j, i), from_pile=pile_no)
+                        #game1.do_turn(0, Position(j, i), from_pile=pile_no)
+                        game1.do_turn(0, Position(j, i), Position(do_turn_from.x, do_turn_from.y), from_pile=pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
@@ -576,7 +577,8 @@ def Move_Human_Goblet():
                         turn = "P1"
                         draw_game_board()
                         move_gobblet(selected_image, Table_centers[i][j])
-                        game1.do_turn(1, Position(j, i), from_pile=pile_no)
+                        #game1.do_turn(1, Position(j, i), from_pile=pile_no)
+                        game1.do_turn(1, Position(j, i), Position(do_turn_from.x, do_turn_from.y), from_pile=pile_no)
                         var1, var2 = game1.check_win()
                         print(var1, var2)
 
