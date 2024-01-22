@@ -496,13 +496,19 @@ def Move_Human_Goblet():
                 if (turn == "P1"):
                     if (Black_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
-                        pile_no = (2 - y)
+                        if(do_turn_from.x is None and do_turn_from.y is None):
+                            pile_no = (2 - y)
+                        else:
+                            pile_no = None
                         clicked = True
 
                 elif (turn == "P2"):
                     if (White_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = White_Gobblets_rect[3 - x][2 - y]
-                        pile_no = (2 - y)
+                        if(do_turn_from.x is None and do_turn_from.y is None):
+                            pile_no = (2 - y)
+                        else:
+                            pile_no = None
                         clicked = True
 
             elif (mode_selection == "hard_ai_vs_human"):
@@ -510,7 +516,10 @@ def Move_Human_Goblet():
                 if (turn == "P1"):
                     if (Black_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
-                        pile_no = (2 - y)
+                        if(do_turn_from.x is None and do_turn_from.y is None):
+                            pile_no = (2 - y)
+                        else:
+                            pile_no = None
                         clicked = True
 
                 elif (turn == "P2"):
@@ -521,7 +530,10 @@ def Move_Human_Goblet():
                 if (turn == "P1"):
                     if (Black_Gobblets_rect[3 - x][2 - y].collidepoint(mouse_pos)):
                         selected_image = Black_Gobblets_rect[3 - x][2 - y]
-                        pile_no = (2 - y)
+                        if(do_turn_from.x is None and do_turn_from.y is None):
+                            pile_no = (2 - y)
+                        else:
+                            pile_no = None
                         clicked = True
 
                 elif (turn == "P2"):
