@@ -147,16 +147,18 @@ class Game:
             # raise Exception("You cannot play on another player's rock unless they have 3 in a row")
         return True
 
-    def do_turn(self, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> None:
-        self.is_valid(player_id, to_grid, from_grid, from_pile)
+    def do_turn(self, player_id, to_grid: Position, from_grid: Position = None, from_pile: int = None) -> bool:
+        if not self.is_valid(player_id, to_grid, from_grid, from_pile):
+            return False
         self.player[player_id].turns += 1
-        if from_pile != None:
+        if from_pile is not None:
             self.grid[to_grid.x][to_grid.y].push(
                 self.player[player_id].piles[from_pile].pop())
             # self.grid[to_grid.x][to_grid.y].rocks[-1].pile_no = from_pile
-        elif from_grid != None:
+        elif from_grid is not None:
             self.grid[to_grid.x][to_grid.y].push(
                 self.grid[from_grid.x][from_grid.y].pop())
+        return True
 
     def undo_turn(self, player_id, from_grid: Position, to_grid: Position = None, to_pile: int = None) -> None:
         if to_pile != None:

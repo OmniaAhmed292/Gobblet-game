@@ -565,22 +565,44 @@ def Move_Human_Goblet():
                     global game1
 
                     if (turn == "P1"):
-                        turn = "P2"
-                        draw_game_board()
-                        move_gobblet(selected_image, Table_centers[i][j])
-                        #game1.do_turn(0, Position(j, i), from_pile=pile_no)
-                        game1.do_turn(0, Position(j, i), Position(do_turn_from.x, do_turn_from.y), from_pile=pile_no)
-                        var1, var2 = game1.check_win()
-                        print(var1, var2)
+                        if do_turn_from.x is None and do_turn_from.y is None:
+                            if game1.do_turn(0, Position(j, i), from_pile=pile_no):
+                                turn = "P2"
+                                draw_game_board()
+                                move_gobblet(selected_image, Table_centers[i][j])
+                                #game1.do_turn(0, Position(j, i), from_pile=pile_no)
+
+                                var1, var2 = game1.check_win()
+                                print(var1, var2)
+                        else:
+                            if game1.do_turn(0, Position(j, i), Position(do_turn_from.x, do_turn_from.y)):
+                                turn = "P2"
+                                draw_game_board()
+                                move_gobblet(selected_image, Table_centers[i][j])
+                                #game1.do_turn(0, Position(j, i), from_pile=pile_no)
+
+                                var1, var2 = game1.check_win()
+                                print(var1, var2)
 
                     elif (turn == "P2"):
-                        turn = "P1"
-                        draw_game_board()
-                        move_gobblet(selected_image, Table_centers[i][j])
-                        #game1.do_turn(1, Position(j, i), from_pile=pile_no)
-                        game1.do_turn(1, Position(j, i), Position(do_turn_from.x, do_turn_from.y), from_pile=pile_no)
-                        var1, var2 = game1.check_win()
-                        print(var1, var2)
+                        if do_turn_from.x is None and do_turn_from.y is None:
+                            if game1.do_turn(1, Position(j, i), from_pile=pile_no):
+                                turn = "P1"
+                                draw_game_board()
+                                move_gobblet(selected_image, Table_centers[i][j])
+                                #game1.do_turn(1, Position(j, i), from_pile=pile_no)
+
+                                var1, var2 = game1.check_win()
+                                print(var1, var2)
+                        else:
+
+                            if game1.do_turn(1, Position(j, i), Position(do_turn_from.x, do_turn_from.y)):
+                                turn = "P1"
+                                draw_game_board()
+                                move_gobblet(selected_image, Table_centers[i][j])
+                                #game1.do_turn(1, Position(j, i), from_pile=pile_no)
+                                var1, var2 = game1.check_win()
+                                print(var1, var2)
 
                     game1.print_grid()
 
@@ -825,7 +847,10 @@ def Game_Handler(mode):
                 global winner
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = best_move(game1, True, 0)
-                game1.do_turn(0, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(0, to, from_pile=pile)
+                else:
+                    game1.do_turn(0, to, frm)
                 turn = "P2"
                 draw_game_board()
                 move_gobblet(
@@ -843,7 +868,10 @@ def Game_Handler(mode):
                     return
 
                 to, frm, pile, pn, sz = best_move(game1, False, 1)
-                game1.do_turn(1, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(1, to, from_pile=pile)
+                else:
+                    game1.do_turn(1, to, frm)
                 turn = "P1"
                 draw_game_board()
                 move_gobblet(
@@ -866,7 +894,10 @@ def Game_Handler(mode):
             while not end:
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = Random_move(game1, 0)
-                game1.do_turn(0, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(0, to, from_pile=pile)
+                else:
+                    game1.do_turn(0, to, frm)
                 turn = "P2"
                 draw_game_board()
                 move_gobblet(
@@ -888,7 +919,10 @@ def Game_Handler(mode):
                 turn = "P1"
                 draw_game_board()
                 to, frm, pile, pn, sz = Random_move(game1, 1)
-                game1.do_turn(1, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(1, to, from_pile=pile)
+                else:
+                    game1.do_turn(1, to, frm, pile)
                 move_gobblet(
                     White_Gobblets_rect[4 - sz][pn], Table_centers[to.y][to.x])
                 game1.print_grid()
@@ -911,7 +945,10 @@ def Game_Handler(mode):
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = Random_move(game1, 0)
                 time.sleep(2)
-                game1.do_turn(0, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(0, to, from_pile=pile)
+                else:
+                    game1.do_turn(0, to, frm)
                 turn = "P2"
                 draw_game_board()
                 move_gobblet(
@@ -931,7 +968,11 @@ def Game_Handler(mode):
                 # move_gobblet(Black_Gobblets_rect[1][0], Table_centers[to.x][to.y])
 
                 to, frm, pile, pn, sz = best_move(game1, True, 1)
-                game1.do_turn(1, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(1, to, from_pile=pile)
+                else:
+                    game1.do_turn(1, to, frm)
+
                 turn = "P1"
                 draw_game_board()
                 move_gobblet(
@@ -955,7 +996,10 @@ def Game_Handler(mode):
             while not end:
                 end, winner = game1.check_win()
                 to, frm, pile, pn, sz = best_move(game1, False, 0)
-                game1.do_turn(0, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(0, to, from_pile=pile)
+                else:
+                    game1.do_turn(0, to, frm)
                 turn = "P2"
                 draw_game_board()
                 move_gobblet(
@@ -976,7 +1020,10 @@ def Game_Handler(mode):
 
                 to, frm, pile, pn, sz = Random_move(game1, 1)
                 time.sleep(2)
-                game1.do_turn(1, to, frm, pile)
+                if frm is None:
+                    game1.do_turn(1, to, from_pile=pile)
+                else:
+                    game1.do_turn(1, to, frm)
                 turn = "P2"
                 draw_game_board()
                 move_gobblet(
@@ -1012,7 +1059,10 @@ def Game_Handler(mode):
         print("hard vs human")
         if(turn=="P2"):
             to, frm, pile, pn, sz = best_move(game1, True, 1)
-            game1.do_turn(1, to, frm, pile)
+            if frm is None:
+                game1.do_turn(1, to, from_pile=pile)
+            else:
+                game1.do_turn(1, to, frm)
             turn = "P1"
             draw_game_board()
             move_gobblet(
@@ -1048,7 +1098,10 @@ def Game_Handler(mode):
         print("Easy vs human")
         if(turn=="P2"):
             to, frm, pile, pn, sz = Random_move(game1, 1)
-            game1.do_turn(1, to, frm, pile)
+            if frm is None:
+                game1.do_turn(1, to, from_pile=pile)
+            else:
+                game1.do_turn(1, to, frm)
             turn = "P1"
             draw_game_board()
             move_gobblet(
