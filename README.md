@@ -31,4 +31,4 @@ This project aims to feature an interactive game interface and supports:
 ## Heuristic used and approximations
 
 ## UML diagram
-[Diagram](https://github.com/OmniaAhmed292/Gobblet-game/blob/main/UML%20diagram/Gobblet%20Game%20UML%20diagram.png)
+Link to UML [diagram](https://github.com/OmniaAhmed292/Gobblet-game/blob/main/UML%20diagram/Gobblet%20Game%20UML%20diagram.png)
