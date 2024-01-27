@@ -18,21 +18,43 @@ This project is a Python implementation of the popular board game Gobblet, playe
 ## Gobblet - User Manual
 
 ### Installation
-1. Download: 
+
+1. **Download:** 
 - Download the project files from [link]()
 - Extract the files to your preferred location.
+2. **Dependencies:**
+- No external libraries are required.
+3. **Run the Game:**
+// TODO
 
+### Game Modes:
+1. **Single-Player Mode:**
+* **Easy Mode:**
+- AI opponent makes random moves.
+- Suitable for casual gameplay.
 
-## Features
+* **Hard Mode:**
+- AI opponent uses alpha-beta pruning to make optimal moves.
+- A challenge for experienced players.
 
-This project aims to feature an interactive game interface and supports:
-  - Single-player against an AI opponent with configurable difficulty levels.
-  - Two-player mode.
-  - AI against AI.
+2. **Two-Player Mode:**
+- Play against a friend on the same computer.
+
+3. **AI vs. AI:**
+- Watch the AI battle it out.
+
+### Game Objective: 
+- Line up four game pieces of the same color in a row.
+- Achieve this vertically, horizontally, or diagonally.
+## Key Features
   - The project enforces game rules and detects winning conditions.
-  - Board visualization for better game understanding.
+  - Interactive board visualization for better game understanding.
+
 
 ## Heuristic used and approximations
+
+## Demo
+Check out our video demo for a quick overview through this [Link]().
 
 ## UML diagram
 Link to UML [diagram](https://github.com/OmniaAhmed292/Gobblet-game/blob/main/UML%20diagram/Gobblet%20Game%20UML%20diagram.png)
