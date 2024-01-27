@@ -60,3 +60,10 @@ Check out our video demo for a quick overview through this [Link]().
 
 ## UML diagram
 Link to UML [diagram](https://github.com/OmniaAhmed292/Gobblet-game/blob/main/UML%20diagram/Gobblet%20Game%20UML%20diagram.png)
+
+## References:
+
+- [Pygame documentation](https://www.pygame.org/docs/)
+- [Gobblet Rules](boardspace.net/gobblet/english/gobblet_rules.pdf)
+- [How to play Gobblet](youtube.com/watch?v=aSaAjQY8_b0)
+
