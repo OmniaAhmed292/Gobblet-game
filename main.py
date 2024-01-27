@@ -7,6 +7,5 @@ if __name__ == "__main__":
     initialize_fonts()
     initialize_buttons()
     Events_Handler()
-    game1.print_grid()
     pygame.quit()
     sys.exit()

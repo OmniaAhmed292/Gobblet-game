@@ -730,19 +730,19 @@ def Events_Handler():
                         elif active_input == player2_input_rect and len(player2_name) < 15:
                             player2_name += event.unicode
 
-                # Draw input fields for player names
-                pygame.draw.rect(screen, (255, 255, 255), player1_input_rect)
-                pygame.draw.rect(screen, (255, 255, 255), player2_input_rect)
+                    # Draw input fields for player names
+                    pygame.draw.rect(screen, (255, 255, 255), player1_input_rect)
+                    pygame.draw.rect(screen, (255, 255, 255), player2_input_rect)
 
-                player1_surface = input_font.render(
-                    player1_name, True, (0, 0, 0))
-                player2_surface = input_font.render(
-                    player2_name, True, (0, 0, 0))
-                screen.blit(
-                    player1_surface, (player1_input_rect.x + 10, player1_input_rect.y + 10))
-                screen.blit(
-                    player2_surface, (player2_input_rect.x + 10, player2_input_rect.y + 10))
-                pygame.display.flip()
+                    player1_surface = input_font.render(
+                        player1_name, True, (0, 0, 0))
+                    player2_surface = input_font.render(
+                        player2_name, True, (0, 0, 0))
+                    screen.blit(
+                        player1_surface, (player1_input_rect.x + 10, player1_input_rect.y + 10))
+                    screen.blit(
+                        player2_surface, (player2_input_rect.x + 10, player2_input_rect.y + 10))
+                    pygame.display.flip()
 
 flag=1
 
