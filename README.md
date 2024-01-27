@@ -21,9 +21,9 @@ This project is a Python implementation of the popular board game Gobblet, playe
 
 **1. Download:** 
 - Download the project files from [link]()
-- Extract the files to your preferred location.
+- Extract the files to your preferred location. <br>
 **2. Dependencies:**
-- No external libraries are required.
+- No external libraries are required. <br>
 **3. Run the Game:**
 // TODO
 
