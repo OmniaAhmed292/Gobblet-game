@@ -1,7 +1,23 @@
 # Gobblet-game
 
-## Description
-The Gobblet Game project is a Python implementation of the popular board game Gobblet, played on a 4x4 grid with twelve pieces per player. The objective of the game is to line up four game pieces of the same color in a row, either vertically, horizontally, or diagonally. 
+## Overview
+This project is a Python implementation of the popular board game Gobblet, played on a 4x4 grid with twelve pieces per player. The objective of the game is to line up four game pieces of the same color in a row, either vertically, horizontally, or diagonally. 
+
+## Contributors
+|**Name**| **ID** | 
+|--|--|
+| Mustafa Mahmoud Mohamed | 1900006 |
+| Youssef Ahmed Nashaat | 1900124 |
+| Sara Ahmed Abdelrahim | 1901247 |
+| Rana Mohamad Ahmad | 1901208 |
+| Omnia Ahmed El Desoky | 1901201 |
+| Rana Gamal Mohammed Daif | 1901398 |
+| Hanan saeed mohamed | 1900948 |
+| Engy Mohamed Abdelmordy Negm | 1900630 | 
+
+## Installation
+Link to exe file: [download]()
+
 
 ## Features
 
