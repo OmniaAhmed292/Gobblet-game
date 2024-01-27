@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 from Game import Game
 from Position import Position
 import math
