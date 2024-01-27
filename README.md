@@ -22,20 +22,22 @@ This project is a Python implementation of the popular board game Gobblet, playe
 **1. Download:** 
 - Download the project files from [link]()
 - Extract the files to your preferred location. <br>
+
 **2. Dependencies:**
 - No external libraries are required. <br>
+
 **3. Run the Game:**
 // TODO
 
 ### Game Modes:
 **1. Single-Player Mode:**
-* **Easy Mode:**
-- AI opponent makes random moves.
-- Suitable for casual gameplay.
+**a. Easy Mode:**
+  - AI opponent makes random moves.
+  - Suitable for casual gameplay.
 
-* **Hard Mode:**
-- AI opponent uses alpha-beta pruning to make optimal moves.
-- A challenge for experienced players.
+**b. Hard Mode:**
+  - AI opponent uses alpha-beta pruning to make optimal moves.
+  - A challenge for experienced players.
 
 **2. Two-Player Mode:**
 - Play against a friend on the same computer.
