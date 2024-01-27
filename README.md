@@ -15,8 +15,12 @@ This project is a Python implementation of the popular board game Gobblet, playe
 | Hanan saeed mohamed | 1900948 |
 | Engy Mohamed Abdelmordy Negm | 1900630 | 
 
-## Installation
-Link to exe file: [download]()
+## Gobblet - User Manual
+
+### Installation
+1. Download: 
+- Download the project files from [link]()
+- Extract the files to your preferred location.
 
 
 ## Features
